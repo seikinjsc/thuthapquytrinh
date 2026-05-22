@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seikin — Thu thập thông tin vận hành</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#1a1814;
+  --ink2:#4a4640;
+  --ink3:#8a8480;
+  --paper:#f7f4ef;
+  --paper2:#edeae3;
+  --paper3:#e2ddd5;
+  --accent:#c8492a;
+  --accent2:#e8bfb0;
+  --border:#d4cfc6;
+  --success:#2d6a4f;
+  --success-bg:#d8f3dc;
+  --r:6px;
+}
+
+body{
+  font-family:'Be Vietnam Pro',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+.page-header{
+  background:var(--ink);
+  color:var(--paper);
+  padding:2.5rem 2rem 2rem;
+  position:relative;
+  overflow:hidden;
+}
+.page-header::before{
+  content:'';
+  position:absolute;
+  top:-40px;right:-40px;
+  width:200px;height:200px;
+  border:40px solid var(--accent);
+  border-radius:50%;
+  opacity:.15;
+}
+.header-label{
+  font-size:11px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--accent2);
+  margin-bottom:.5rem;
+}
+.header-title{
+  font-family:'Noto Serif',serif;
+  font-size:1.8rem;
+  font-weight:600;
+  line-height:1.2;
+  margin-bottom:.5rem;
+}
+.header-sub{
+  font-size:.875rem;
+  color:#b0aaa0;
+  max-width:520px;
+}
+
+.progress-bar{
+  height:3px;
+  background:var(--paper3);
+}
+.progress-fill{
+  height:100%;
+  background:var(--accent);
+  width:0%;
+  transition:width .4s ease;
+}
+
+.container{
+  max-width:780px;
+  margin:0 auto;
+  padding:2rem 1.5rem 4rem;
+}
+
+.status-msg{
+  display:none;
+  padding:.875rem 1.25rem;
+  border-radius:var(--r);
+  font-size:.875rem;
+  margin-bottom:1.5rem;
+  border-left:3px solid;
+}
+.status-msg.ok{
+  background:var(--success-bg);
+  color:var(--success);
+  border-color:var(--success);
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+}
+.status-msg.err{
+  background:#fdecea;
+  color:#b71c1c;
+  border-color:#b71c1c;
+  display:flex;
+}
+.status-msg.info{
+  background:#fff8f0;
+  color:#7a4200;
+  border-color:#e07b39;
+  display:flex;
+}
+
+.section{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  margin-bottom:1.25rem;
+  overflow:hidden;
+}
+.section-header{
+  padding:1rem 1.25rem .875rem;
+  border-bottom:1px solid var(--paper3);
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  background:var(--paper);
+}
+.section-icon{
+  width:32px;height:32px;
+  background:var(--ink);
+  color:var(--paper);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  flex-shrink:0;
+}
+.section-title{
+  font-size:.9375rem;
+  font-weight:600;
+  color:var(--ink);
+}
+.section-desc{
+  font-size:.8125rem;
+  color:var(--ink3);
+}
+.section-body{
+  padding:1.25rem;
+}
+
+.field{margin-bottom:1.125rem}
+.field:last-child{margin-bottom:0}
+.field label{
+  display:block;
+  font-size:.8125rem;
+  font-weight:600;
+  color:var(--ink2);
+  margin-bottom:.3rem;
+  letter-spacing:.01em;
+}
+.required::after{content:' *';color:var(--accent)}
+.hint{
+  font-size:.75rem;
+  color:var(--ink3);
+  margin-bottom:.4rem;
+  line-height:1.5;
+}
+
+input[type=text],input[type=date],input[type=email],
+select,textarea{
+  width:100%;
+  padding:.6rem .8rem;
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  font-family:'Be Vietnam Pro',sans-serif;
+  font-size:.875rem;
+  color:var(--ink);
+  background:#fff;
+  outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(200,73,42,.1);
+}
+textarea{resize:vertical;min-height:90px;line-height:1.6}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:560px){.row2,.row3{grid-template-columns:1fr}}
+
+.fee-table{width:100%;border-collapse:collapse}
+.fee-table thead th{
+  font-size:.75rem;font-weight:600;
+  color:var(--ink3);
+  text-align:left;
+  padding:.4rem .6rem;
+  border-bottom:1px solid var(--border);
+  letter-spacing:.03em;
+}
+.fee-table tbody td{padding:.35rem .4rem}
+.fee-table tbody tr:hover td{background:var(--paper)}
+.fee-table input{
+  border:none;
+  background:transparent;
+  padding:.3rem .4rem;
+  font-size:.875rem;
+  border-radius:4px;
+}
+.fee-table input:focus{
+  background:#fff;
+  border:1px solid var(--accent);
+  box-shadow:0 0 0 2px rgba(200,73,42,.08);
+}
+.fee-name{font-size:.8125rem;color:var(--ink2);padding:.5rem .6rem;font-weight:500}
+
+.char-count{
+  font-size:.7rem;
+  color:var(--ink3);
+  text-align:right;
+  margin-top:3px;
+}
+
+.btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.65rem 1.4rem;
+  border-radius:var(--r);
+  font-family:'Be Vietnam Pro',sans-serif;
+  font-size:.875rem;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .15s;
+  border:none;
+}
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+}
+.btn-primary:hover{background:#b03d22}
+.btn-primary:active{transform:scale(.98)}
+.btn-secondary{
+  background:var(--paper2);
+  color:var(--ink2);
+  border:1px solid var(--border);
+}
+.btn-secondary:hover{background:var(--paper3)}
+.btn-danger{
+  background:transparent;
+  color:#b71c1c;
+  border:1px solid #f5c6c6;
+}
+.btn-danger:hover{background:#fdecea}
+
+.action-bar{
+  display:flex;gap:.75rem;flex-wrap:wrap;
+  margin-top:1.75rem;
+  padding-top:1.5rem;
+  border-top:1px solid var(--border);
+}
+
+.export-area{
+  display:none;
+  margin-top:1.25rem;
+}
+.export-box{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:1rem 1.25rem;
+  font-size:.8125rem;
+  line-height:1.7;
+  white-space:pre-wrap;
+  max-height:320px;
+  overflow-y:auto;
+  color:var(--ink2);
+  font-family:monospace;
+}
+.export-actions{
+  display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap;
+}
+
+.saved-badge{
+  display:none;
+  align-items:center;
+  gap:.4rem;
+  font-size:.8125rem;
+  color:var(--success);
+  padding:.3rem .7rem;
+  background:var(--success-bg);
+  border-radius:20px;
+}
+.saved-badge.show{display:inline-flex}
+
+.step-list{display:flex;flex-direction:column;gap:.75rem}
+.step-item{display:grid;grid-template-columns:28px 1fr;gap:.75rem;align-items:start}
+.step-num{
+  width:28px;height:28px;
+  background:var(--ink);color:var(--paper);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:600;
+  flex-shrink:0;margin-top:2px;
+}
+
+.divider{
+  height:1px;background:var(--paper3);
+  margin:1rem 0;
+}
+
+.footer{
+  text-align:center;
+  padding:2rem;
+  font-size:.8125rem;
+  color:var(--ink3);
+  border-top:1px solid var(--border);
+}
+
+svg.icon{
+  width:16px;height:16px;
+  stroke:currentColor;fill:none;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  vertical-align:-3px;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-label">Nội bộ Seikin — Bảo mật</div>
+  <div class="header-title">Thu thập thông tin vận hành</div>
+  <div class="header-sub">Điền đầy đủ và bấm "Lưu & Xuất". Dữ liệu lưu trên máy bạn — gửi file JSON hoặc copy text cho quản lý khi hoàn tất.</div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="container">
+
+  <div id="status" class="status-msg"></div>
+
+  <!-- SECTION 0: Người điền -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Thông tin người điền</div>
+        <div class="section-desc">Để quản lý biết ai đã gửi thông tin này</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row2">
+        <div class="field">
+          <label class="required">Họ tên</label>
+          <input type="text" id="filler_name" placeholder="Nguyễn Văn A" oninput="updateProgress()">
+        </div>
+        <div class="field">
+          <label class="required">Ngày điền</label>
+          <input type="date" id="fill_date" oninput="updateProgress()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: Phí -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Bảng phí dịch vụ</div>
+        <div class="section-desc">Ghi phí thực tế đang áp dụng — VD: "15% số tiền nhận được", "500,000 VND", "thoả thuận"</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th style="width:36%">Dịch vụ</th>
+            <th style="width:32%">Phí</th>
+            <th style="width:32%">Ghi chú / điều kiện</th>
+          </tr>
+        </thead>
+        <tbody id="fee-body">
+          <tr><td class="fee-name">Nenkin lần 1</td><td><input type="text" id="f1" placeholder="VD: 15% số tiền nhận"></td><td><input type="text" id="n1" placeholder="Tối thiểu..."></td></tr>
+          <tr><td class="fee-name">Nenkin lần 2</td><td><input type="text" id="f2" placeholder=""></td><td><input type="text" id="n2" placeholder=""></td></tr>
+          <tr><td class="fee-name">Nenkin lần 3</td><td><input type="text" id="f3" placeholder=""></td><td><input type="text" id="n3" placeholder=""></td></tr>
+          <tr><td class="fee-name">Thuế — phụng dưỡng</td><td><input type="text" id="f4" placeholder=""></td><td><input type="text" id="n4" placeholder=""></td></tr>
+          <tr><td class="fee-name">Thai sản / sinh con</td><td><input type="text" id="f5" placeholder=""></td><td><input type="text" id="n5" placeholder=""></td></tr>
+          <tr><td class="fee-name">Papa育休</td><td><input type="text" id="f6" placeholder=""></td><td><input type="text" id="n6" placeholder=""></td></tr>
+          <tr><td class="fee-name">Kentaikyo</td><td><input type="text" id="f7" placeholder=""></td><td><input type="text" id="n7" placeholder=""></td></tr>
+          <tr><td class="fee-name">Bảo hiểm thất nghiệp</td><td><input type="text" id="f8" placeholder=""></td><td><input type="text" id="n8" placeholder=""></td></tr>
+          <tr><td class="fee-name">Miễn giảm 国民年金</td><td><input type="text" id="f9" placeholder=""></td><td><input type="text" id="n9" placeholder=""></td></tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-top:1rem">
+        <label>Dịch vụ khác (nếu có)</label>
+        <textarea id="fee_extra" placeholder="Tên dịch vụ — Phí — Ghi chú&#10;..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Kênh liên hệ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Kênh tiếp nhận khách</div>
+        <div class="section-desc">Khách tìm đến Seikin qua đâu?</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="required">Các kênh khách liên hệ</label>
+        <div class="hint">Liệt kê tất cả kênh đang dùng, ghi rõ kênh nào là chính</div>
+        <textarea id="intake_channels" rows="3" placeholder="VD: Facebook Fanpage (chính), Zalo cá nhân, website seikin.vn, khách giới thiệu..."></textarea>
+      </div>
+      <div class="field">
+        <label>Thông tin khách tự khai khi liên hệ lần đầu</label>
+        <div class="hint">Khách thường chủ động nói gì? Mình có form/câu hỏi mẫu gửi trước không?</div>
+        <textarea id="intake_self" rows="2" placeholder="VD: Khách tự mô tả tình huống, gửi ảnh sổ Nenkin, hỏi phí..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Quy trình -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Quy trình xử lý hồ sơ</div>
+        <div class="section-desc">Mô tả từng bước thực tế nhân viên đang làm</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="field" style="margin:0">
+            <label>Tiếp nhận và đánh giá sơ bộ</label>
+            <div class="hint">Hỏi gì? Kiểm tra điều kiện ra sao?</div>
+            <textarea id="step1" rows="3" placeholder="VD: Hỏi tên, đang ở Nhật hay VN, ngày về nước, tình trạng sổ Nenkin, loại bảo hiểm đang đóng..."></textarea>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="field" style="margin:0">
+            <label>Báo giá và ký kết</label>
+            <div class="hint">Gửi bảng phí qua kênh nào? Có hợp đồng/biên bản không?</div>
+            <textarea id="step2" rows="3" placeholder="VD: Gửi bảng phí qua Zalo, khách xác nhận tin nhắn, không có hợp đồng viết tay..."></textarea>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="field" style="margin:0">
+            <label>Thu hồ sơ từ khách</label>
+            <div class="hint">Khách gửi bản scan hay bản gốc? Qua kênh nào?</div>
+            <textarea id="step3" rows="3" placeholder="VD: Khách chụp ảnh gửi Zalo, bản gốc sổ Nenkin gửi bưu điện, Seikin photo lại và trả gốc..."></textarea>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="field" style="margin:0">
+            <label>Xử lý nội bộ và gửi đi Nhật</label>
+            <div class="hint">Ai kiểm tra hồ sơ? Gửi EMS hay dịch vụ nào? Chi phí gửi ai trả?</div>
+            <textarea id="step4" rows="3" placeholder="VD: Nhân viên X kiểm tra, anh Hiến duyệt cuối, gửi EMS khoảng 400k, khách trả phí gửi..."></textarea>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="field" style="margin:0">
+            <label>Theo dõi và bàn giao kết quả</label>
+            <div class="hint">Báo tiến độ cho khách bao lâu/lần? Tiền về xong thì làm gì?</div>
+            <textarea id="step5" rows="3" placeholder="VD: Báo khách sau khi JPS nhận hồ sơ, theo dõi mỗi 2 tháng, thu phí khi tiền về tài khoản khách..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: SLA -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Thời gian xử lý thực tế</div>
+        <div class="section-desc">Ghi theo kinh nghiệm thực tế — không phải lý thuyết</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row2">
+        <div class="field">
+          <label>Nenkin lần 1 (gửi → tiền về VN)</label>
+          <input type="text" id="sla1" placeholder="VD: 5–7 tháng">
+        </div>
+        <div class="field">
+          <label>Nenkin lần 2 (sau lần 1 → hoàn xong)</label>
+          <input type="text" id="sla2" placeholder="VD: 3–4 tháng sau lần 1">
+        </div>
+        <div class="field">
+          <label>Thuế — phụng dưỡng</label>
+          <input type="text" id="sla3" placeholder="VD: 1–2 tháng">
+        </div>
+        <div class="field">
+          <label>Thai sản / sinh con</label>
+          <input type="text" id="sla4" placeholder="VD: 2–3 tháng">
+        </div>
+        <div class="field">
+          <label>Kentaikyo</label>
+          <input type="text" id="sla5" placeholder="VD: ...">
+        </div>
+        <div class="field">
+          <label>Papa育休</label>
+          <input type="text" id="sla6" placeholder="VD: ...">
+        </div>
+      </div>
+      <div class="field">
+        <label>Ghi chú thêm về thời gian</label>
+        <textarea id="sla_note" rows="2" placeholder="VD: Mùa cao điểm cuối năm JPS xử lý chậm hơn..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: FAQ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div>
+        <div class="section-title">FAQ — Câu hỏi khách hay hỏi nhất</div>
+        <div class="section-desc">Ghi ít nhất 5–10 câu. Format: H: câu hỏi / A: câu trả lời chuẩn</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <div class="hint">Ghi những câu thực tế khách hỏi nhiều nhất — kể cả câu hỏi tưởng ngốc</div>
+        <textarea id="faq" style="min-height:200px" placeholder="H: Tôi về nước 2 năm rồi, còn lấy Nenkin được không?
+A: Deadline là 24 tháng kể từ ngày xuất cảnh. Cần xác nhận ngày xuất cảnh cụ thể.
+
+H: Không có sổ Nenkin thì sao?
+A: ...
+
+H: Seikin thu phí khi nào?
+A: ...
+
+H: Tôi có thể tự làm không cần qua Seikin không?
+A: ..."></textarea>
+        <div class="char-count" id="faq-count">0 ký tự</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Lỗi thường gặp -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#7a1f1f">
+        <svg class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Lỗi & rủi ro thường gặp</div>
+        <div class="section-desc">Lỗi nhân viên hay mắc, hoặc tình huống khó từng gặp</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Lỗi nhân viên hay mắc khi tư vấn</label>
+        <textarea id="errors_staff" rows="4" placeholder="VD: Nhầm điều kiện Kosei vs Kokumin Nenkin, quên hỏi ngày xuất cảnh để tính deadline 24 tháng..."></textarea>
+      </div>
+      <div class="field">
+        <label>Tình huống khó / tranh chấp đã gặp</label>
+        <textarea id="errors_cases" rows="4" placeholder="VD: Khách mất sổ Nenkin, khách không cắt địa chỉ trước khi về, hồ sơ bị JPS trả lại vì sai SWIFT..."></textarea>
+      </div>
+      <div class="field">
+        <label>Những điều nhân viên mới cần biết ngay</label>
+        <textarea id="errors_newbie" rows="3" placeholder="VD: Luôn hỏi ngày xuất cảnh trước tiên, không nhận hồ sơ Kentaikyo khi chưa xác nhận số tem..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: Liên hệ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg class="icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.32 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.23 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Kênh liên hệ Seikin</div>
+        <div class="section-desc">Thông tin chính thức để đưa vào hướng dẫn nội bộ</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row2">
+        <div class="field">
+          <label>Website</label>
+          <input type="text" id="c_web" placeholder="seikin.vn">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="text" id="c_email" placeholder="...@seikin.vn">
+        </div>
+        <div class="field">
+          <label>Facebook</label>
+          <input type="text" id="c_fb" placeholder="facebook.com/...">
+        </div>
+        <div class="field">
+          <label>Zalo</label>
+          <input type="text" id="c_zalo" placeholder="Số hoặc link OA">
+        </div>
+      </div>
+      <div class="field">
+        <label>Thông tin bổ sung khác</label>
+        <textarea id="extra" rows="3" placeholder="Bất kỳ thông tin nào khác cần có trong tài liệu nội bộ..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action bar -->
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="saveAndExport()">
+      <svg class="icon" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Lưu & Xuất
+    </button>
+    <button class="btn btn-secondary" onclick="downloadJSON()">
+      <svg class="icon" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Tải file JSON
+    </button>
+    <span class="saved-badge" id="saved-badge">
+      <svg class="icon" style="width:13px;height:13px;stroke:var(--success)"><polyline points="20 6 9 17 4 12"/></svg>
+      Đã lưu
+    </span>
+    <button class="btn btn-danger" style="margin-left:auto" onclick="clearAll()">Xoá tất cả</button>
+  </div>
+
+  <div class="export-area" id="export-area">
+    <div class="section-title" style="margin-bottom:.75rem;color:var(--ink2)">Dữ liệu đã xuất — gửi đoạn text này cho quản lý</div>
+    <div class="export-box" id="export-box"></div>
+    <div class="export-actions">
+      <button class="btn btn-secondary" onclick="copyText()">
+        <svg class="icon" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy text
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Seikin Management — Tài liệu nội bộ — Không chia sẻ bên ngoài</div>
+
+<script>
+const LSKEY = 'seikin_m0_v1';
+
+const textFields = [
+  'filler_name','fill_date',
+  'f1','n1','f2','n2','f3','n3','f4','n4','f5','n5','f6','n6','f7','n7','f8','n8','f9','n9',
+  'fee_extra',
+  'intake_channels','intake_self',
+  'step1','step2','step3','step4','step5',
+  'sla1','sla2','sla3','sla4','sla5','sla6','sla_note',
+  'faq',
+  'errors_staff','errors_cases','errors_newbie',
+  'c_web','c_email','c_fb','c_zalo','extra'
+];
+
+function g(id){ return (document.getElementById(id)||{}).value || ''; }
+function s(id,v){ const el=document.getElementById(id); if(el) el.value=v||''; }
+
+function updateProgress(){
+  const required = ['filler_name','fill_date','intake_channels','step1','faq'];
+  const filled = required.filter(id => g(id).trim().length > 0).length;
+  document.getElementById('progress').style.width = (filled/required.length*100)+'%';
+}
+
+function collect(){
+  const data = { _version:1, _saved: new Date().toISOString() };
+  textFields.forEach(id => data[id] = g(id));
+  return data;
+}
+
+function restore(data){
+  textFields.forEach(id => s(id, data[id]));
+  updateProgress();
+  updateCharCount();
+}
+
+function saveLocal(){
+  localStorage.setItem(LSKEY, JSON.stringify(collect()));
+  const badge = document.getElementById('saved-badge');
+  badge.classList.add('show');
+  setTimeout(()=>badge.classList.remove('show'), 2500);
+}
+
+function formatText(data){
+  const line = (label,val) => val ? `${label}:\n${val}\n` : '';
+  const fees = [1,2,3,4,5,6,7,8,9].map(i=>{
+    const svc=['Nenkin lần 1','Nenkin lần 2','Nenkin lần 3','Thuế - phụng dưỡng','Thai sản / sinh con','Papa育休','Kentaikyo','Bảo hiểm thất nghiệp','Miễn giảm 国民年金'][i-1];
+    const f=data['f'+i], n=data['n'+i];
+    if(!f) return '';
+    return `  ${svc}: ${f}${n?' ('+n+')':''}`;
+  }).filter(Boolean).join('\n');
+
+  return `=== M0 — QUY TRÌNH VẬN HÀNH SEIKIN ===
+Người điền: ${data.filler_name||'—'}  |  Ngày: ${data.fill_date||'—'}
+
+--- BẢNG PHÍ ---
+${fees||'(chưa điền)'}
+${data.fee_extra?'\nDịch vụ khác:\n'+data.fee_extra:''}
+
+--- KÊNH TIẾP NHẬN ---
+${line('Kênh liên hệ',data.intake_channels)}${line('Khách tự khai',data.intake_self)}
+--- QUY TRÌNH ---
+Bước 1 — Tiếp nhận: ${data.step1||'—'}
+
+Bước 2 — Báo giá: ${data.step2||'—'}
+
+Bước 3 — Thu hồ sơ: ${data.step3||'—'}
+
+Bước 4 — Xử lý nội bộ: ${data.step4||'—'}
+
+Bước 5 — Bàn giao: ${data.step5||'—'}
+
+--- THỜI GIAN XỬ LÝ THỰC TẾ ---
+Nenkin lần 1: ${data.sla1||'—'}
+Nenkin lần 2: ${data.sla2||'—'}
+Thuế phụng dưỡng: ${data.sla3||'—'}
+Thai sản: ${data.sla4||'—'}
+Kentaikyo: ${data.sla5||'—'}
+Papa育休: ${data.sla6||'—'}
+${data.sla_note?'Ghi chú: '+data.sla_note:''}
+
+--- FAQ ---
+${data.faq||'(chưa điền)'}
+
+--- LỖI & RỦI RO ---
+Lỗi nhân viên: ${data.errors_staff||'—'}
+Tình huống khó: ${data.errors_cases||'—'}
+Cần biết ngay: ${data.errors_newbie||'—'}
+
+--- LIÊN HỆ ---
+Web: ${data.c_web||'—'}  |  Email: ${data.c_email||'—'}
+Facebook: ${data.c_fb||'—'}  |  Zalo: ${data.c_zalo||'—'}
+${data.extra?'\nBổ sung:\n'+data.extra:''}`;
+}
+
+function showStatus(msg, type){
+  const el = document.getElementById('status');
+  el.className = 'status-msg ' + type;
+  el.textContent = msg;
+  el.style.display = 'flex';
+  if(type==='ok') setTimeout(()=>el.style.display='none', 3000);
+}
+
+function saveAndExport(){
+  const name = g('filler_name').trim();
+  const date = g('fill_date').trim();
+  if(!name || !date){
+    showStatus('Vui lòng điền họ tên và ngày trước khi lưu.', 'err');
+    return;
+  }
+  saveLocal();
+  const data = collect();
+  const text = formatText(data);
+  const box = document.getElementById('export-box');
+  box.textContent = text;
+  const area = document.getElementById('export-area');
+  area.style.display = 'block';
+  area.scrollIntoView({behavior:'smooth', block:'start'});
+  showStatus('Đã lưu và xuất dữ liệu. Copy text bên dưới hoặc tải JSON.', 'ok');
+}
+
+function downloadJSON(){
+  const data = collect();
+  const name = (data.filler_name||'nhanvien').replace(/\s+/g,'_');
+  const date = (data.fill_date||new Date().toISOString().split('T')[0]);
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `seikin_m0_${name}_${date}.json`;
+  a.click();
+}
+
+function copyText(){
+  const text = document.getElementById('export-box').textContent;
+  navigator.clipboard.writeText(text).then(()=>showStatus('Đã copy vào clipboard','ok'));
+}
+
+function clearAll(){
+  if(!confirm('Xoá toàn bộ dữ liệu đã nhập?')) return;
+  textFields.forEach(id => s(id,''));
+  localStorage.removeItem(LSKEY);
+  document.getElementById('export-area').style.display='none';
+  document.getElementById('status').style.display='none';
+  updateProgress();
+}
+
+function updateCharCount(){
+  const el = document.getElementById('faq');
+  const cnt = document.getElementById('faq-count');
+  if(el && cnt) cnt.textContent = el.value.length + ' ký tự';
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('fill_date').value = new Date().toISOString().split('T')[0];
+
+  const saved = localStorage.getItem(LSKEY);
+  if(saved){
+    try{
+      const data = JSON.parse(saved);
+      restore(data);
+      const dt = data._saved ? new Date(data._saved).toLocaleString('vi-VN') : '';
+      showStatus('Đã tải dữ liệu đã lưu trước đó' + (dt?' ('+dt+')':'') + '.', 'info');
+    }catch(e){}
+  }
+
+  document.getElementById('faq').addEventListener('input', updateCharCount);
+
+  textFields.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>{ updateProgress(); saveLocal(); });
+  });
+
+  updateProgress();
+  updateCharCount();
+});
+</script>
+</body>
+</html>
