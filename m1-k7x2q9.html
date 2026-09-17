@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phiếu M1 — Seikin</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#1a1d23; --muted:#6b7280; --line:#e3e6ea;
+    --brand:#0f766e; --brand-soft:#e6f4f1; --warn:#b45309; --warn-soft:#fef3c7;
+    --ok:#15803d; --ok-soft:#dcfce7; --err:#b91c1c; --err-soft:#fee2e2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    padding-bottom:90px}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--brand);color:#fff;padding:22px 16px 18px}
+  header .wrap{padding:0}
+  h1{margin:0 0 6px;font-size:21px;line-height:1.3}
+  header p{margin:0;opacity:.9;font-size:14px}
+  .progress-track{height:4px;background:rgba(255,255,255,.25);margin-top:14px;border-radius:2px;overflow:hidden}
+  .progress-bar{height:100%;width:0;background:#fff;transition:width .3s}
+
+  .section{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden}
+  .section-header{padding:14px 16px;border-bottom:1px solid var(--line);background:#fafbfc}
+  .section-title{margin:0;font-size:16px;font-weight:650}
+  .section-desc{margin:5px 0 0;font-size:13.5px;color:var(--muted)}
+  .section-body{padding:16px}
+  .time{display:inline-block;background:var(--brand-soft);color:var(--brand);
+    font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+
+  .q{padding:14px 0;border-bottom:1px dashed var(--line)}
+  .q:last-child{border-bottom:none;padding-bottom:0}
+  .q-text{font-weight:600;margin:0 0 9px;font-size:15px}
+  .q-num{color:var(--brand);font-weight:700;margin-right:5px}
+  .opt{display:block;padding:9px 11px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;cursor:pointer;font-size:14.5px}
+  .opt:hover{background:#fafbfc}
+  .opt input{margin-right:8px}
+  .opt:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+  .conf{margin-top:8px;font-size:13px;color:var(--muted)}
+  .conf select{font-size:13px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;margin-left:6px}
+
+  label.f{display:block;font-weight:600;margin:0 0 6px;font-size:14.5px}
+  .hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+  input[type=text],input[type=date],textarea,select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+  textarea{min-height:88px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--brand);outline-offset:-1px;border-color:var(--brand)}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:180px}
+
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:11px 13px;
+    border-radius:0 8px 8px 0;font-size:14px;margin:0 0 16px}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  button{font:inherit;font-size:14.5px;font-weight:600;padding:11px 16px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  button.ghost{color:var(--muted)}
+
+  .badge{position:fixed;top:14px;right:14px;background:var(--ok);color:#fff;padding:6px 12px;
+    border-radius:99px;font-size:13px;opacity:0;transform:translateY(-8px);transition:.25s;pointer-events:none}
+  .badge.show{opacity:1;transform:none}
+  .status{display:none;padding:11px 13px;border-radius:9px;margin:14px 0;font-size:14px}
+  .status.ok{background:var(--ok-soft);color:var(--ok)}
+  .status.err{background:var(--err-soft);color:var(--err)}
+  .status.info{background:var(--brand-soft);color:var(--brand)}
+  #export-area{display:none}
+  pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:9px;overflow-x:auto;
+    font-size:12.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Phiếu M1 — nghiệp vụ, cách trả lời khách, và kênh video</h1>
+    <p>Dành cho nhân viên Seikin · khoảng 12 phút · làm dở bỏ đó được, máy tự lưu</p>
+    <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="note">
+    <b>Trả lời thật, đừng trả lời "đẹp".</b> Phiếu này không chấm điểm ai giỏi ai kém — nó để biết
+    mảng nào cần soạn sẵn câu trả lời cho anh/chị, và soạn theo đúng giọng anh/chị hay nói.
+    <b>Không biết thì chọn "Chưa chắc" — đó là câu trả lời có ích nhất, không phải câu tệ nhất.</b>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <!-- ===== THÔNG TIN ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Thông tin người điền</h2>
+    </div>
+    <div class="section-body">
+      <div class="row">
+        <div class="field">
+          <label class="f" for="filler_name">Họ tên</label>
+          <input type="text" id="filler_name" placeholder="Ví dụ: Đỗ Thị Mai">
+        </div>
+        <div class="field">
+          <label class="f" for="fill_date">Ngày điền</label>
+          <input type="date" id="fill_date">
+        </div>
+      </div>
+      <div class="field">
+        <label class="f" for="role">Hiện đang làm phần việc nào?</label>
+        <p class="hint">Ví dụ: "xử lý hồ sơ lần 1 từ lúc chốt đơn đến lúc gửi đi", "tư vấn khách mới", "kiểm hồ sơ".</p>
+        <input type="text" id="role" placeholder="Ghi ngắn, đúng việc đang làm">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PHẦN A ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần A — Khách hỏi thì trả lời sao<span class="time">~6 phút</span></h2>
+      <p class="section-desc">10 tình huống có thật. Chọn câu anh/chị sẽ nói với khách. Sau mỗi câu
+        có ô <b>"Mức chắc chắn"</b> — chọn đúng mức thật, nó quan trọng hơn cả câu trả lời.</p>
+    </div>
+    <div class="section-body">
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">1.</span> Khách nhắn: <i>"Mất giấy tờ có làm được không anh?"</i> — khách không còn giữ sổ nenkin.</p>
+        <label class="opt"><input type="radio" name="a1" value="A">Không làm được, phải có sổ nenkin mới làm</label>
+        <label class="opt"><input type="radio" name="a1" value="B">Vẫn làm được — thay bằng thông tin công ty cũ (tên, địa chỉ, thời gian làm) để tra số bảo hiểm</label>
+        <label class="opt"><input type="radio" name="a1" value="C">Phải xin cấp lại sổ ở Nhật trước rồi mới làm được</label>
+        <label class="opt"><input type="radio" name="a1" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac1"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">2.</span> Khách đã về Việt Nam, hỏi có phải quay lại Nhật không.</p>
+        <label class="opt"><input type="radio" name="a2" value="A">Làm được ngay khi về VN, không cần quay lại — và phải hỏi <b>ngày rời Nhật</b> để tính hạn 2 năm</label>
+        <label class="opt"><input type="radio" name="a2" value="B">Làm được nhưng phải chờ đủ 6 tháng sau khi về</label>
+        <label class="opt"><input type="radio" name="a2" value="C">Phải quay lại Nhật ít nhất một lần để nộp hồ sơ</label>
+        <label class="opt"><input type="radio" name="a2" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac2"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">3.</span> Khách hỏi: <i>"Tài khoản Yucho có dùng được không ạ?"</i></p>
+        <label class="opt"><input type="radio" name="a3" value="A">Không dùng được, Yucho không nhận được tiền từ Nhật về</label>
+        <label class="opt"><input type="radio" name="a3" value="B">Dùng được hết, ngân hàng nào cũng như nhau</label>
+        <label class="opt"><input type="radio" name="a3" value="C"><b>Tuỳ dịch vụ</b> — phải hỏi khách đang làm dịch vụ nào rồi mới trả lời</label>
+        <label class="opt"><input type="radio" name="a3" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac3"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">4.</span> Khách hỏi ngay câu đầu: <i>"Em được bao nhiêu tiền?"</i></p>
+        <label class="opt"><input type="radio" name="a4" value="A">Tính nhanh rồi báo một con số cụ thể cho khách yên tâm</label>
+        <label class="opt"><input type="radio" name="a4" value="B">Chỉ nói <b>ước lượng</b>, kèm câu "để chính xác thì Seikin cần xem giấy tờ"</label>
+        <label class="opt"><input type="radio" name="a4" value="C">Không nói gì về tiền, bảo khách gửi hồ sơ rồi biết</label>
+        <label class="opt"><input type="radio" name="a4" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac4"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">5.</span> Khách hỏi tiền nenkin về mấy đợt.</p>
+        <label class="opt"><input type="radio" name="a5" value="A">Về một lần duy nhất, đủ toàn bộ</label>
+        <label class="opt"><input type="radio" name="a5" value="B">2 đợt — lần 1 khoảng 80% về thẳng tài khoản VN, lần 2 khoảng 20% Seikin nhận hộ ở Nhật rồi chuyển lại</label>
+        <label class="opt"><input type="radio" name="a5" value="C">2 đợt, mỗi đợt một nửa</label>
+        <label class="opt"><input type="radio" name="a5" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac5"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">6.</span> Khách hỏi: <i>"Phí trả khi nào ạ? Không lấy được có mất tiền không?"</i></p>
+        <label class="opt"><input type="radio" name="a6" value="A">Luôn thu trước khi làm hồ sơ</label>
+        <label class="opt"><input type="radio" name="a6" value="B">Luôn thu sau khi có kết quả, không có ngoại lệ</label>
+        <label class="opt"><input type="radio" name="a6" value="C">Đa số thu khi có kết quả — <b>nhưng có vài trường hợp trả trước</b>, nên phải hỏi khách đang làm dịch vụ nào và đang ở đâu</label>
+        <label class="opt"><input type="radio" name="a6" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac6"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">7.</span> Khách về nước rồi mới nhớ ra <b>chưa cắt địa chỉ cư trú</b> (転出届).</p>
+        <label class="opt"><input type="radio" name="a7" value="A">Phải quay lại Nhật mới cắt được</label>
+        <label class="opt"><input type="radio" name="a7" value="B">Không cần quay lại — cắt địa chỉ làm online được, Seikin hỗ trợ thủ tục</label>
+        <label class="opt"><input type="radio" name="a7" value="C">Không cắt cũng không sao, không ảnh hưởng hồ sơ</label>
+        <label class="opt"><input type="radio" name="a7" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac7"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">8.</span> Khách muốn hoàn thuế vì <b>gửi tiền về nuôi bố mẹ</b> — cần giấy gì?</p>
+        <label class="opt"><input type="radio" name="a8" value="A">Chỉ cần giấy khai sinh chứng minh quan hệ là đủ</label>
+        <label class="opt"><input type="radio" name="a8" value="B">Giấy chuyển tiền (SBI/Dcom/JRF/Smile) <b>cùng năm với tờ Gensen</b> + giấy xác minh quan hệ. Gửi tiền mặt hoặc chuyển về chính tài khoản mình thì <b>không tính</b></label>
+        <label class="opt"><input type="radio" name="a8" value="C">Gửi kiểu nào cũng được, miễn có chứng từ</label>
+        <label class="opt"><input type="radio" name="a8" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac8"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">9.</span> Khách muốn làm <b>nenkin + thai sản + hoàn thuế</b> cùng lúc.</p>
+        <label class="opt"><input type="radio" name="a9" value="A">Được — các dịch vụ độc lập, làm song song không ảnh hưởng nhau</label>
+        <label class="opt"><input type="radio" name="a9" value="B">Phải làm xong cái này mới làm cái kia</label>
+        <label class="opt"><input type="radio" name="a9" value="C">Chỉ làm được tối đa 2 dịch vụ một lúc</label>
+        <label class="opt"><input type="radio" name="a9" value="D">Chưa chắc — em hỏi lại rồi trả lời khách sau</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac9"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">10.</span> Khách hỏi về <b>Kentaikyō</b>: <i>"Em nghe nói đủ 185 tem là lấy được đúng không ạ?"</i></p>
+        <label class="opt"><input type="radio" name="a10" value="A">Đúng rồi, đủ 185 tem là lấy được</label>
+        <label class="opt"><input type="radio" name="a10" value="B">Không phải 185 — số tem khác, em nói lại cho khách ngay</label>
+        <label class="opt"><input type="radio" name="a10" value="C">Chưa chắc — em kiểm lại với Seikin/chị Mai rồi trả lời khách sau</label>
+        <label class="opt"><input type="radio" name="a10" value="D">Em không làm mảng này nên nói thẳng với khách là em không rành</label>
+        <div class="conf">Mức chắc chắn:
+          <select id="ac10"><option value="">— chọn —</option><option>Chắc chắn</option><option>Khá chắc</option><option>Đoán</option></select></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== PHẦN B ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần B — Gõ y như đang chat với khách<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Bốn câu dưới là <b>lời thật của khách trong nhóm Facebook</b>, giữ nguyên
+        chính tả gốc. Gõ câu trả lời đúng như anh/chị vẫn gõ — có emoji thì cứ để, viết tắt cũng được.
+        <b>Phần này không có câu sai.</b> Nó chỉ để bắt đúng giọng anh/chị.</p>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="f" for="b1">1. <i>"Viettinbank có ai nhận tiền lần1 chưa mọi người ưi????"</i></label>
+        <p class="hint">Câu này khách hỏi cả nhóm, không hỏi riêng mình. Anh/chị sẽ bình luận gì?</p>
+        <textarea id="b1" placeholder="Gõ đúng như sẽ gõ trong nhóm…"></textarea>
+      </div>
+      <div class="field">
+        <label class="f" for="b2">2. <i>"Các ac cho em hỏi cty cũ không trả giấy gensen thì có cách nào lấy được không ạ"</i></label>
+        <textarea id="b2" placeholder="…"></textarea>
+      </div>
+      <div class="field">
+        <label class="f" for="b3">3. <i>"Giấy số 2 bác sĩ ghi TIẾNG VIỆT HAY TIẾNG NHẬT, con dấu có bắt buộc không?"</i></label>
+        <textarea id="b3" placeholder="…"></textarea>
+      </div>
+      <div class="field">
+        <label class="f" for="b4">4. <i>"nenkin lần 2 cách lần 1 bao lâu ạ"</i></label>
+        <textarea id="b4" placeholder="…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PHẦN C ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần C — Kênh video cá nhân<span class="time">~3 phút</span></h2>
+      <p class="section-desc">Công ty chuẩn bị dựng bộ hướng dẫn quay và mẫu kịch bản sẵn cho từng
+        mảng dịch vụ. Phần này để biết <b>nên soạn mẫu nào trước cho anh/chị</b>.</p>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="f" for="c_topics">1. Tháng vừa rồi, ba câu khách hỏi anh/chị <b>nhiều nhất</b> là gì?</label>
+        <p class="hint">Cứ ghi đúng kiểu khách hỏi. Đây sẽ là đề tài ba video đầu tiên.</p>
+        <textarea id="c_topics" placeholder="1.&#10;2.&#10;3."></textarea>
+      </div>
+      <div class="field">
+        <label class="f" for="c_best">2. Câu nào anh/chị trả lời <b>trôi chảy nhất, không cần tra</b> lại gì?</label>
+        <textarea id="c_best" placeholder="…"></textarea>
+      </div>
+      <div class="field">
+        <label class="f" for="c_case">3. Có ca khách nào nhớ mãi không? Kể 2–3 câu.</label>
+        <p class="hint">Khó, vui, hay cảm động đều được. Không cần tên khách.</p>
+        <textarea id="c_case" placeholder="…"></textarea>
+      </div>
+      <div class="field">
+        <label class="f" for="c_place">4. Quay video thì quay ở đâu được?</label>
+        <select id="c_place">
+          <option value="">— chọn —</option>
+          <option>Văn phòng Seikin</option>
+          <option>Góc riêng ở nhà</option>
+          <option>Cả hai đều được</option>
+          <option>Chưa có chỗ nào ưng</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="f" for="c_phone">5. Điện thoại đang dùng là gì?</label>
+        <input type="text" id="c_phone" placeholder="Ví dụ: iPhone 13, Redmi 10C…">
+      </div>
+      <div class="field">
+        <label class="f" for="c_time">6. Mỗi tuần dành được bao nhiêu thời gian cho quay + đăng?</label>
+        <select id="c_time">
+          <option value="">— chọn —</option>
+          <option>1–2 tiếng/tuần</option>
+          <option>3–5 tiếng/tuần</option>
+          <option>Nửa ngày/tuần</option>
+          <option>Nhiều hơn nếu cần</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="f" for="c_face">7. Có đồng ý <b>xuất hiện mặt</b> trên video không?</label>
+        <select id="c_face">
+          <option value="">— chọn —</option>
+          <option>Có, quay mặt bình thường</option>
+          <option>Chỉ giọng nói + chữ trên màn hình</option>
+          <option>Chưa chắc, muốn thử rồi quyết</option>
+          <option>Không muốn lên hình</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="f" for="c_fear">8. Ngại nhất điều gì khi làm video công khai?</label>
+        <select id="c_fear">
+          <option value="">— chọn —</option>
+          <option>Sợ nói sai kiến thức</option>
+          <option>Ngại người quen nhìn thấy</option>
+          <option>Sợ không ai xem</option>
+          <option>Ngại giọng / ngoại hình lên hình</option>
+          <option>Không biết bắt đầu từ đâu</option>
+          <option>Không ngại gì cả</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="f" for="extra">9. Còn gì muốn nói thêm không?</label>
+        <textarea id="extra" placeholder="Để trống cũng được"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div id="export-area">
+    <div class="section">
+      <div class="section-header"><h2 class="section-title">Kết quả — gửi phần này về</h2>
+        <p class="section-desc">Bấm <b>Copy</b> rồi dán vào Zalo, hoặc bấm <b>Tải JSON</b> rồi gửi file.</p></div>
+      <div class="section-body">
+        <pre id="export-box"></pre>
+        <div class="row">
+          <button onclick="copyText()">📋 Copy</button>
+          <button onclick="downloadJSON()">⬇ Tải JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="badge" id="saved-badge">✓ Đã lưu</div>
+
+<div class="bar">
+  <button class="primary" onclick="saveAndExport()">Xong — xuất kết quả</button>
+  <button class="ghost" onclick="clearAll()">Xoá hết</button>
+</div>
+
+<script>
+const LSKEY = 'seikin_m1_v1';
+
+const textFields = [
+  'filler_name','fill_date','role',
+  'ac1','ac2','ac3','ac4','ac5','ac6','ac7','ac8','ac9','ac10',
+  'b1','b2','b3','b4',
+  'c_topics','c_best','c_case','c_place','c_phone','c_time','c_face','c_fear','extra'
+];
+const radioGroups = ['a1','a2','a3','a4','a5','a6','a7','a8','a9','a10'];
+
+function g(id){ const el=document.getElementById(id); return el ? (el.value||'') : ''; }
+function s(id,v){ const el=document.getElementById(id); if(el) el.value = v||''; }
+function gr(name){ const el=document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
+function sr(name,v){ if(!v) return; const el=document.querySelector(`input[name="${name}"][value="${v}"]`); if(el) el.checked=true; }
+
+function answeredCount(){
+  let n=0;
+  radioGroups.forEach(k=>{ if(gr(k)) n++; });
+  ['b1','b2','b3','b4','c_topics','c_best','c_case','c_place','c_phone','c_time','c_face','c_fear']
+    .forEach(k=>{ if(g(k).trim()) n++; });
+  if(g('filler_name').trim()) n++;
+  if(g('role').trim()) n++;
+  return n;
+}
+const TOTAL = 10 + 12 + 2;
+
+function updateProgress(){
+  document.getElementById('progress').style.width = (answeredCount()/TOTAL*100)+'%';
+}
+
+function collect(){
+  const d = { _form:'M1', _version:1, _saved:new Date().toISOString() };
+  textFields.forEach(id => d[id] = g(id));
+  radioGroups.forEach(k => d[k] = gr(k));
+  return d;
+}
+
+function restore(d){
+  textFields.forEach(id => s(id, d[id]));
+  radioGroups.forEach(k => sr(k, d[k]));
+  updateProgress();
+}
+
+function saveLocal(){
+  try{ localStorage.setItem(LSKEY, JSON.stringify(collect())); }catch(e){ return; }
+  const b = document.getElementById('saved-badge');
+  b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'), 2000);
+}
+
+function formatText(d){
+  const A = radioGroups.map((k,i)=>`  Câu ${i+1}: ${d[k]||'—'}   (mức chắc chắn: ${d['ac'+(i+1)]||'—'})`).join('\n');
+  const blk = (t,v) => `${t}\n${(v||'—')}\n`;
+  return `=== PHIẾU M1 — SEIKIN ===
+Người điền: ${d.filler_name||'—'}   |   Ngày: ${d.fill_date||'—'}
+Phần việc đang làm: ${d.role||'—'}
+
+--- PHẦN A — TRẮC NGHIỆM NGHIỆP VỤ ---
+${A}
+
+--- PHẦN B — CÁCH TRẢ LỜI KHÁCH ---
+${blk('1) Viettinbank có ai nhận tiền lần 1 chưa:', d.b1)}
+${blk('2) Công ty cũ không trả gensen:', d.b2)}
+${blk('3) Giấy số 2 tiếng Việt hay tiếng Nhật:', d.b3)}
+${blk('4) Nenkin lần 2 cách lần 1 bao lâu:', d.b4)}
+--- PHẦN C — KÊNH VIDEO ---
+${blk('Ba câu khách hỏi nhiều nhất:', d.c_topics)}
+${blk('Câu trả lời trôi chảy nhất:', d.c_best)}
+${blk('Ca khách nhớ mãi:', d.c_case)}
+Chỗ quay: ${d.c_place||'—'}
+Điện thoại: ${d.c_phone||'—'}
+Thời gian/tuần: ${d.c_time||'—'}
+Lên hình: ${d.c_face||'—'}
+Ngại nhất: ${d.c_fear||'—'}
+${d.extra ? '\nNói thêm:\n'+d.extra : ''}`;
+}
+
+function showStatus(msg,type){
+  const el=document.getElementById('status');
+  el.className='status '+type; el.textContent=msg; el.style.display='block';
+  if(type==='ok') setTimeout(()=>el.style.display='none', 4000);
+}
+
+function saveAndExport(){
+  if(!g('filler_name').trim() || !g('fill_date').trim()){
+    showStatus('Điền họ tên và ngày trước đã nhé.','err');
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  saveLocal();
+  const d = collect();
+  document.getElementById('export-box').textContent = formatText(d);
+  const area = document.getElementById('export-area');
+  area.style.display='block';
+  area.scrollIntoView({behavior:'smooth',block:'start'});
+  const missing = TOTAL - answeredCount();
+  showStatus(missing>0
+    ? `Đã xuất kết quả. Còn ${missing} câu chưa trả lời — gửi luôn cũng được, bỏ trống cũng là thông tin.`
+    : 'Đã xuất đủ. Copy hoặc tải JSON gửi về nhé.','ok');
+}
+
+function downloadJSON(){
+  const d = collect();
+  const name = (d.filler_name||'nhanvien').replace(/\s+/g,'_');
+  const date = d.fill_date || new Date().toISOString().split('T')[0];
+  const blob = new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `seikin_m1_${name}_${date}.json`;
+  a.click();
+}
+
+function copyText(){
+  const t = document.getElementById('export-box').textContent;
+  navigator.clipboard.writeText(t)
+    .then(()=>showStatus('Đã copy. Dán vào Zalo gửi về nhé.','ok'))
+    .catch(()=>showStatus('Không copy tự động được — bôi đen đoạn trên rồi copy tay nhé.','err'));
+}
+
+function clearAll(){
+  if(!confirm('Xoá hết những gì đã điền?')) return;
+  textFields.forEach(id=>s(id,''));
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  try{ localStorage.removeItem(LSKEY); }catch(e){}
+  document.getElementById('export-area').style.display='none';
+  document.getElementById('status').style.display='none';
+  document.getElementById('fill_date').value = new Date().toISOString().split('T')[0];
+  updateProgress();
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('fill_date').value = new Date().toISOString().split('T')[0];
+
+  let saved=null;
+  try{ saved = localStorage.getItem(LSKEY); }catch(e){}
+  if(saved){
+    try{
+      const d = JSON.parse(saved);
+      restore(d);
+      const dt = d._saved ? new Date(d._saved).toLocaleString('vi-VN') : '';
+      showStatus('Đã mở lại phần đã điền dở'+(dt?' ('+dt+')':'')+'.','info');
+    }catch(e){}
+  }
+
+  textFields.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>{ updateProgress(); saveLocal(); });
+    if(el && el.tagName==='SELECT') el.addEventListener('change', ()=>{ updateProgress(); saveLocal(); });
+  });
+  document.querySelectorAll('input[type=radio]').forEach(r=>{
+    r.addEventListener('change', ()=>{ updateProgress(); saveLocal(); });
+  });
+
+  updateProgress();
+});
+</script>
+</body>
+</html>
