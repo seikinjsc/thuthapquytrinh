@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Phiếu K2 — Seikin</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#1a1d23; --muted:#6b7280; --line:#e3e6ea;
+    --brand:#0f766e; --brand-soft:#e6f4f1; --warn:#b45309; --warn-soft:#fef3c7;
+    --ok:#15803d; --ok-soft:#dcfce7; --err:#b91c1c; --err-soft:#fee2e2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    padding-bottom:90px}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--brand);color:#fff;padding:22px 16px 18px}
+  header .wrap{padding:0}
+  h1{margin:0 0 6px;font-size:21px;line-height:1.3}
+  header p{margin:0;opacity:.9;font-size:14px}
+  .progress-track{height:4px;background:rgba(255,255,255,.25);margin-top:14px;border-radius:2px;overflow:hidden}
+  .progress-bar{height:100%;width:0;background:#fff;transition:width .3s}
+
+  .section{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden}
+  .section-header{padding:14px 16px;border-bottom:1px solid var(--line);background:#fafbfc}
+  .section-title{margin:0;font-size:16px;font-weight:650}
+  .section-desc{margin:5px 0 0;font-size:13.5px;color:var(--muted)}
+  .section-body{padding:16px}
+  .time{display:inline-block;background:var(--brand-soft);color:var(--brand);
+    font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+
+  .q{padding:14px 0;border-bottom:1px dashed var(--line)}
+  .q:last-child{border-bottom:none;padding-bottom:0}
+  .q-text{font-weight:600;margin:0 0 9px;font-size:15px}
+  .q-num{color:var(--brand);font-weight:700;margin-right:5px}
+  .opt{display:block;padding:9px 11px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;cursor:pointer;font-size:14.5px}
+  .opt:hover{background:#fafbfc}
+  .opt input{margin-right:8px}
+  .opt:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+  .conf{margin-top:8px;font-size:13px;color:var(--muted)}
+  .conf select{font-size:13px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;margin-left:6px}
+
+  label.f{display:block;font-weight:600;margin:0 0 6px;font-size:14.5px}
+  .hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+  input[type=text],input[type=date],textarea,select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+  textarea{min-height:88px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--brand);outline-offset:-1px;border-color:var(--brand)}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:180px}
+
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:11px 13px;
+    border-radius:0 8px 8px 0;font-size:14px;margin:0 0 16px}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  button{font:inherit;font-size:14.5px;font-weight:600;padding:11px 16px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  button.ghost{color:var(--muted)}
+
+  .badge{position:fixed;top:14px;right:14px;background:var(--ok);color:#fff;padding:6px 12px;
+    border-radius:99px;font-size:13px;opacity:0;transform:translateY(-8px);transition:.25s;pointer-events:none}
+  .badge.show{opacity:1;transform:none}
+  .status{display:none;padding:11px 13px;border-radius:9px;margin:14px 0;font-size:14px}
+  .status.ok{background:var(--ok-soft);color:var(--ok)}
+  .status.err{background:var(--err-soft);color:var(--err)}
+  .status.info{background:var(--brand-soft);color:var(--brand)}
+  #export-area{display:none}
+  pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:9px;overflow-x:auto;
+    font-size:12.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+</style>
+<style>
+  .grid-doc{display:grid;grid-template-columns:1fr;gap:8px}
+  .doc{border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+  .doc b{display:block;font-size:14.5px;margin-bottom:6px}
+  .doc .opt{display:inline-block;margin:0 6px 6px 0;padding:6px 10px;font-size:13.5px}
+  .gioihan{font-size:12.5px;color:var(--warn);margin:-4px 0 8px}
+  .mau{font-style:italic}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Phiếu K2 — công việc thanh toán và cách bạn góp vào video</h1>
+    <p>Dành cho bộ phận thanh toán · quyết toán · khoảng 12–15 phút · <b>gần như chỉ cần bấm chọn</b> · làm dở bỏ đó được, máy tự lưu</p>
+    <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="note">
+    <b>Không có câu nào đúng sai về con người bạn.</b> Phiếu hỏi về <b>việc bạn làm mỗi ngày</b> — để
+    anh Hiến chọn cách bạn góp vào video <b>đúng việc bạn giỏi</b> — không bắt làm tư vấn, <b>không bắt lên hình</b>.
+    Phần C có vài câu kiến thức: <b>không biết thì chọn "Không biết"</b> — đó là câu trả lời có ích,
+    vì nó cho biết chủ đề nào không nên đưa cho bạn.
+  </div>
+  <div id="status" class="status"></div>
+  <div id="form"></div>
+
+  <div id="export-area">
+    <div class="section">
+      <div class="section-header"><h2 class="section-title">Kết quả — gửi phần này về</h2>
+        <p class="section-desc">Bấm <b>Copy</b> rồi dán vào Zalo gửi anh Hiến, hoặc bấm <b>Tải JSON</b> rồi gửi file.</p></div>
+      <div class="section-body">
+        <pre id="export-box"></pre>
+        <div class="row">
+          <button onclick="copyText()">📋 Copy</button>
+          <button onclick="downloadJSON()">⬇ Tải JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="badge" id="saved-badge">✓ Đã lưu</div>
+<div class="bar">
+  <button class="primary" onclick="saveAndExport()">Xong — xuất kết quả</button>
+  <button class="ghost" onclick="clearAll()">Xoá hết</button>
+</div>
+
+<script>
+// Phiếu dựng từ dữ liệu: sửa câu hỏi ở mảng PHIEU, không sửa HTML.
+// Kiểu: text · radio · check (max = chọn tối đa) · doc (lưới giấy tờ) · quiz (chọn + mức chắc chắn)
+const SUCO = ["Sai tên hoặc số tài khoản của khách","Ngân hàng trả tiền về, tiền bị treo","Khách đổi tài khoản giữa chừng",
+  "Chậm vì cuối tuần, ngày lễ","Tỷ giá biến động, khách thắc mắc","Đối soát với đại lý bị lệch",
+  "Khách không biết tiền đã về","Chuyển nhầm, chuyển thiếu"];
+const PHIEU = [
+ {sec:"A. Xác nhận thông tin", desc:"Một số ô đã điền sẵn từ phiếu M1 — sửa nếu sai.", phut:2, q:[
+  {id:"ten", t:"text", q:"Họ tên đầy đủ", v:"Nguyễn Thu Hiền"},
+  {id:"vaitro", t:"text", q:"Phần việc đang làm", v:"Thanh toán, Quyết toán"},
+  {id:"thamnien", t:"text", q:"Làm ở Seikin bao lâu"},
+  {id:"tuoi", t:"text", q:"Tuổi"},
+  {id:"que", t:"text", q:"Quê / đang sống ở đâu"},
+  {id:"chucdanh", t:"radio", q:"Nếu có video, bạn muốn giới thiệu mình là", o:["Phó giám đốc Seikin","Phụ trách thanh toán của Seikin","Chỉ tên, không ghi chức danh","Không giới thiệu tên"]},
+  {id:"giong", t:"radio", q:"Giọng nói hằng ngày của bạn", o:["Giọng Bắc","Giọng miền Trung","Giọng miền Nam","Pha, tuỳ lúc"]},
+ ]},
+ {sec:"B. Công việc hằng ngày", desc:"Phần quan trọng nhất — chọn theo những gì bạn làm thật.", phut:5, q:[
+  {id:"viec", t:"check", max:3, q:"Việc chiếm nhiều thời gian nhất của bạn", o:["Theo dõi tiền về (từ cục Nenkin, sở thuế)","Chuyển tiền cho khách","Đối soát với đại lý","Tính phí, quyết toán cho đại lý","Xuất hoá đơn","Trả lời thắc mắc về tiền","Theo dõi tỷ giá, đổi tiền"]},
+  {id:"sokhach", t:"radio", q:"Mỗi tháng bạn chuyển tiền cho khoảng bao nhiêu khách / đơn?", o:["Dưới 50","50–200","200–500","Trên 500"]},
+  {id:"kenh", t:"check", q:"Tiền đi qua những kênh nào?", o:["Dcom","Ngân hàng Nhật","Ngân hàng Việt Nam","Wise","Kênh khác"]},
+  {id:"hoi", t:"check", max:4, q:"Câu hỏi về tiền bạn nghe nhiều nhất (từ đại lý, đồng nghiệp, khách)", o:["Bao giờ tiền về","Sao tiền về ít hơn dự tính","Tỷ giá tính thế nào","Phí trừ bao nhiêu","Sao chưa nhận được chuyển khoản","Tiền bị trả về Nhật thì sao","Xin hoá đơn","Có bị trừ thuế nữa không"]},
+  {id:"suco", t:"check", max:3, q:"Sự cố về tiền hay gặp nhất", o:SUCO},
+  {id:"suco1", t:"radio", q:"Trong các sự cố đó, cái nào gặp NHIỀU nhất?", o:SUCO},
+  {id:"mua", t:"check", q:"Những tháng nào việc tiền nong bận nhất?", o:["Tháng 1–3","Tháng 4–6","Tháng 7–9","Tháng 10–12","Đều quanh năm"]},
+  {id:"giaithich", t:"radio", q:"Khi có người thắc mắc về số tiền, bạn giải thích thế nào?", o:["Nhắn con số + ảnh chuyển khoản","Gửi bảng tính từng khoản","Gọi điện giải thích","Nhờ người khác trả lời"]},
+  {id:"gioi", t:"radio", q:"Việc bạn thấy mình làm tốt nhất", o:["Đối soát không lệch đồng nào","Giải thích tiền nong dễ hiểu","Xử lý sự cố chuyển tiền","Nhớ tiến độ thanh toán từng đơn","Giữ quan hệ tốt với đại lý"]},
+  {id:"kin", t:"check", q:"Chuyện tiền nào bạn thấy KHÔNG nên nói công khai trên video?", o:["Phí của đại lý","Số tài khoản công ty","Doanh thu, số đơn","Tên, số tiền của khách","Tỷ giá công ty dùng nội bộ","Không có gì phải giấu"]},
+  {id:"chuyen", t:"text", q:"(Không bắt buộc) Kể ngắn 1 lần bạn gỡ được một sự cố tiền cho khách", hint:"Không cần tên khách. Một hai câu là đủ."},
+ ]},
+ {sec:"C. Kiến thức về tiền", desc:"8 câu. Chọn đáp án, rồi chọn mức chắc chắn. Không biết thì chọn \"Không biết\".", phut:3, q:[
+  {id:"c1", t:"quiz", q:"Tiền nenkin lần 2 (hoàn thuế 20,42%) được sở thuế hoàn vào đâu?", o:["Tài khoản ngân hàng Việt Nam của khách","Tài khoản ngân hàng ở Nhật, qua người đại diện thuế","Ví Dcom của khách","Gửi tiền mặt qua bưu điện"]},
+  {id:"c2", t:"quiz", q:"Lần 1 khách nhận được khoảng bao nhiêu phần trăm số tiền được duyệt?", o:["Khoảng 50%","Khoảng 80%","100%","Khoảng 20%"]},
+  {id:"c3", t:"quiz", q:"Muốn nhận tiền lần 1 thẳng bằng tiền Việt, nên mở tài khoản ở ngân hàng nào?", o:["Vietcombank","Techcombank","MB","Ngân hàng nào cũng được"]},
+  {id:"c4", t:"quiz", q:"Giấy xác nhận tài khoản ghi sai mã SWIFT một ký tự thì sao?", o:["Ngân hàng tự sửa, không sao","Tiền quay về Nhật, mất vài tháng làm lại","Tiền vào tài khoản người khác","Chỉ chậm vài ngày"]},
+  {id:"c5", t:"quiz", q:"Tiền lần 2 quy đổi cho khách theo tỷ giá nào?", o:["Tỷ giá ngân hàng Nhà nước","Tỷ giá Dcom ngày chuyển khoản","Tỷ giá ngày nộp hồ sơ","Tỷ giá cố định công ty đặt"]},
+  {id:"c6", t:"quiz", q:"Tiền thai sản có nhận vào tài khoản Yucho được không?", o:["Được","Không","Chỉ khi khách còn ở Nhật"]},
+  {id:"c7", t:"quiz", q:"Khai giảm trừ cho bố mẹ 30–69 tuổi ở Việt Nam, mỗi năm phải gửi tối thiểu bao nhiêu?", o:["10 man","38 man","50 man","Không cần mức tối thiểu"]},
+  {id:"c8", t:"quiz", q:"Gửi tiền về nhà kiểu nào thì sở thuế KHÔNG tính là phụng dưỡng?", o:["Gửi qua Dcom hằng tháng","Gửi về chính tài khoản của mình","Gửi qua ngân hàng hằng tháng","Gửi qua Wise"]},
+ ]},
+ {sec:"D. Kiểu video hợp với bạn", desc:"Phiếu M1 bạn chọn không muốn lên hình — các lựa chọn dưới đây đều có cách không lộ mặt.", phut:3, q:[
+  {id:"vai", t:"radio", q:"Bạn muốn tham gia làm video theo cách nào?", o:["Có kênh riêng, không lộ mặt","Góp giọng đọc cho video của kênh Seikin","Chỉ góp ý tưởng, số liệu — người khác nói","Chưa muốn tham gia"]},
+  {id:"mat", t:"radio", q:"Kiểu xuất hiện bạn chấp nhận được", o:["Chỉ giọng + chữ, bảng số trên màn hình","Giọng + tay (điện thoại, giấy tờ đã che số)","Lộ mặt nếu quay ngắn","Không muốn cả giọng"]},
+  {id:"giongcam", t:"radio", q:"Để giọng thật của bạn lên video, bạn thấy", o:["Thoải mái","Được, nếu không nói tên","Không muốn"]},
+  {id:"xem", t:"check", q:"Bạn hay xem gì trên TikTok / Facebook?", o:["Hài tình huống","Đời sống gia đình","Nấu ăn","Làm đẹp, thời trang","Kiến thức, mẹo hay","Tài chính, tiền bạc","Tin tức","Du lịch"]},
+  {id:"mo", t:"radio", q:"3 câu mở đầu video — câu nào hợp giọng bạn nhất?", o:[
+    "A · \"Tiền nenkin báo về rồi mà tài khoản vẫn chưa thấy? 😅 Đừng lo, nghe mình nói.\"",
+    "B · \"3 lý do tiền nenkin về tài khoản chậm hơn bạn nghĩ.\"",
+    "C · \"Hôm qua có bạn nhắn: chị ơi em chưa thấy tiền đâu…\""]},
+  {id:"dang", t:"check", max:3, q:"Dạng video bạn thấy mình làm được", o:["Bảng tiến độ tiền về hằng tháng (giọng đọc + bảng số)","Hành trình đồng tiền nenkin: từ cục Nenkin về tới tay bạn","Cảnh báo lừa đảo khi nhận, chuyển tiền","Giải thích tỷ giá, vì sao tiền về ít hơn","Hỏi đáp những câu về tiền hay gặp","Hậu trường thanh toán (tay + màn hình đã che số)"]},
+  {id:"ngai", t:"check", q:"Điều bạn ngại (phiếu M1: không biết bắt đầu từ đâu)", o:["Không biết bắt đầu từ đâu","Nói sai con số","Người quen, đối tác thấy","Bị bình luận chê","Lộ thông tin công ty","Giọng nói","Mất thời gian","Không ngại gì"]},
+  {id:"nho", t:"radio", q:"Bạn muốn người xem nhớ tới bạn / phần của bạn là", o:["Người giữ tiền minh bạch, đáng tin","Người giải thích tiền nong dễ hiểu","Người cảnh báo để khỏi mất tiền","Chưa nghĩ tới"]},
+ ]},
+ {sec:"E. Điều kiện", desc:"", phut:2, q:[
+  {id:"gio", t:"radio", q:"Mỗi tuần bạn dành được bao nhiêu thời gian? (phiếu M1: 3–5 tiếng)", o:["1–2 tiếng","3–5 tiếng","Nửa ngày","Tuỳ tuần"]},
+  {id:"khi", t:"radio", q:"Lúc nào bạn làm được?", o:["Trong giờ làm","Sau giờ làm","Cuối tuần","Tuỳ"]},
+  {id:"cho", t:"check", q:"Thu giọng, quay ở đâu được? (phiếu M1: góc riêng ở nhà)", o:["Góc riêng ở nhà","Văn phòng Seikin","Chỗ khác"]},
+  {id:"dt", t:"text", q:"Điện thoại đang dùng (hãng + đời máy)", v:"Xiaomi"},
+  {id:"do", t:"check", q:"Đồ đã có", o:["Mic cài áo / mic thu âm","Tai nghe có mic","Chân máy","Chưa có gì"]},
+  {id:"tiktok", t:"radio", q:"TikTok của bạn", o:["Chưa có tài khoản","Có tài khoản, chỉ xem","Có kênh, đã đăng video"]},
+  {id:"fb", t:"radio", q:"Facebook cá nhân của bạn có ghi làm ở Seikin không?", o:["Có","Không","Không muốn ghi"]},
+ ]},
+ {sec:"F. Động lực", desc:"", phut:1, q:[
+  {id:"lydo", t:"check", q:"Nếu tham gia làm video, vì sao?", o:["Muốn có thêm thu nhập","Muốn học kỹ năng mới","Giúp công ty có thêm khách lẻ","Công ty cần","Thấy hay, muốn thử"]},
+  {id:"bo", t:"check", q:"Điều gì sẽ khiến bạn bỏ giữa chừng?", o:["Không có thời gian","Đăng mà không ai xem","Bị chê","Không biết làm","Việc chính quá tải","Không có thưởng","Không có gì"]},
+  {id:"thuong", t:"radio", q:"Nếu video mang về khách, bạn thích được thưởng kiểu nào?", o:["Theo từng đơn","Cố định hằng tháng","Chưa quan tâm"]},
+  {id:"them", t:"text", q:"(Không bắt buộc) Muốn nói thêm gì", hint:"Phiếu M1 bạn ghi \"một số câu chưa rõ ràng\" — câu nào ở phiếu này chưa rõ thì ghi ở đây."},
+ ]},
+];
+const LSKEY = "seikin_k2_v1";
+const MUC = ["Chắc chắn","Đoán","Không biết"];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CAU = PHIEU.flatMap(s => s.q);
+
+function render(){
+  let n = 0;
+  document.getElementById("form").innerHTML = PHIEU.map(s => `
+  <div class="section"><div class="section-header"><h2 class="section-title">${s.sec}<span class="time">~${s.phut} phút</span></h2>
+    ${s.desc ? `<p class="section-desc">${s.desc}</p>` : ""}</div><div class="section-body">
+    ${s.q.map(c => { n++; return `<div class="q" data-id="${c.id}"><p class="q-text"><span class="q-num">${n}.</span>${esc(c.q)}</p>
+      ${c.hint ? `<p class="hint">${esc(c.hint)}</p>` : ""}${c.max ? `<p class="gioihan">Chọn tối đa ${c.max}</p>` : ""}${o(c)}</div>`; }).join("")}
+  </div></div>`).join("");
+}
+function o(c){
+  if (c.t === "text") return `<input type="text" id="${c.id}" value="${esc(c.v || "")}">`;
+  if (c.t === "doc") return `<div class="grid-doc">${c.d.map((d,i) => `<div class="doc"><b>${esc(d)}</b>${c.o.map(x =>
+      `<label class="opt"><input type="radio" name="${c.id}_${i}" value="${esc(x)}">${esc(x)}</label>`).join("")}</div>`).join("")}</div>`;
+  const kieu = c.t === "check" ? "checkbox" : "radio";
+  let h = c.o.map(x => `<label class="opt"><input type="${kieu}" name="${c.id}" value="${esc(x)}"${c.max ? ` data-max="${c.max}"` : ""}>${esc(x)}</label>`).join("");
+  if (c.t === "quiz") h += `<label class="opt"><input type="radio" name="${c.id}" value="Không làm mảng này">Không làm mảng này</label>
+    <div class="conf">Mức chắc chắn: <select id="${c.id}_muc"><option value=""></option>${MUC.map(m => `<option>${m}</option>`).join("")}</select></div>`;
+  return h;
+}
+
+function collect(){
+  const d = {_form:"K2", _version:1, _saved:new Date().toISOString()};
+  for (const c of CAU){
+    if (c.t === "text") d[c.id] = document.getElementById(c.id).value.trim();
+    else if (c.t === "doc") d[c.id] = c.d.map((x,i) => { const e = document.querySelector(`input[name="${c.id}_${i}"]:checked`); return e ? e.value : ""; });
+    else if (c.t === "check") d[c.id] = [...document.querySelectorAll(`input[name="${c.id}"]:checked`)].map(e => e.value);
+    else { const e = document.querySelector(`input[name="${c.id}"]:checked`); d[c.id] = e ? e.value : "";
+      if (c.t === "quiz") d[c.id + "_muc"] = document.getElementById(c.id + "_muc").value; }
+  }
+  return d;
+}
+function restore(d){
+  for (const c of CAU){
+    const v = d[c.id]; if (v === undefined) continue;
+    if (c.t === "text") document.getElementById(c.id).value = v;
+    else if (c.t === "doc") v.forEach((x,i) => { const e = document.querySelector(`input[name="${c.id}_${i}"][value="${CSS.escape(x)}"]`); if (e) e.checked = true; });
+    else [].concat(v).forEach(x => { const e = document.querySelector(`input[name="${c.id}"][value="${CSS.escape(x)}"]`); if (e) e.checked = true; });
+    if (c.t === "quiz" && d[c.id + "_muc"]) document.getElementById(c.id + "_muc").value = d[c.id + "_muc"];
+  }
+}
+function daTraLoi(d){
+  return CAU.filter(c => { const v = d[c.id]; return c.t === "doc" ? v.some(Boolean) : Array.isArray(v) ? v.length : !!v; }).length;
+}
+function updateProgress(){ document.getElementById("progress").style.width = (daTraLoi(collect()) / CAU.length * 100) + "%"; }
+function saveLocal(){
+  try { localStorage.setItem(LSKEY, JSON.stringify(collect())); } catch(e){ return; }
+  const b = document.getElementById("saved-badge"); b.classList.add("show"); setTimeout(() => b.classList.remove("show"), 1500);
+}
+function formatText(d){
+  let n = 0;
+  return "=== PHIẾU K2 — SEIKIN ===\n" + PHIEU.map(s => `\n--- ${s.sec} ---\n` + s.q.map(c => { n++;
+    const v = d[c.id];
+    if (c.t === "doc") return `${n}. ${c.q}\n` + c.d.map((x,i) => `   · ${x}: ${v[i] || "—"}`).join("\n");
+    const tl = Array.isArray(v) ? (v.join("; ") || "—") : (v || "—");
+    return `${n}. ${c.q}\n   → ${tl}${c.t === "quiz" ? `   (${d[c.id + "_muc"] || "—"})` : ""}`; }).join("\n")).join("\n");
+}
+function showStatus(msg, type){
+  const el = document.getElementById("status"); el.className = "status " + type; el.textContent = msg; el.style.display = "block";
+  if (type === "ok") setTimeout(() => el.style.display = "none", 4000);
+}
+function saveAndExport(){
+  const d = collect();
+  if (!d.ten){ showStatus("Điền họ tên ở câu 1 trước đã nhé.", "err"); window.scrollTo({top:0, behavior:"smooth"}); return; }
+  saveLocal();
+  document.getElementById("export-box").textContent = formatText(d);
+  const a = document.getElementById("export-area"); a.style.display = "block"; a.scrollIntoView({behavior:"smooth", block:"start"});
+  const thieu = CAU.length - daTraLoi(d);
+  showStatus(thieu > 0 ? `Đã xuất. Còn ${thieu} câu bỏ trống — gửi luôn cũng được.` : "Đã xuất đủ. Copy gửi Zalo nhé.", "ok");
+}
+function downloadJSON(){
+  const d = collect(), blob = new Blob([JSON.stringify(d, null, 2)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `seikin_k2_${(d.ten || "nhanvien").replace(/\s+/g, "_")}_${new Date().toISOString().slice(0,10)}.json`; a.click();
+}
+function copyText(){
+  navigator.clipboard.writeText(document.getElementById("export-box").textContent)
+    .then(() => showStatus("Đã copy. Dán vào Zalo gửi anh Hiến nhé.", "ok"))
+    .catch(() => showStatus("Không copy tự động được — bôi đen đoạn trên rồi copy tay nhé.", "err"));
+}
+function clearAll(){
+  if (!confirm("Xoá hết những gì đã điền?")) return;
+  try { localStorage.removeItem(LSKEY); } catch(e){}
+  render(); document.getElementById("export-area").style.display = "none"; updateProgress();
+}
+function bind(){
+  const f = document.getElementById("form");
+  f.addEventListener("change", e => {
+    const el = e.target, max = +el.dataset.max;
+    if (max && el.checked && document.querySelectorAll(`input[name="${el.name}"]:checked`).length > max){
+      el.checked = false; showStatus(`Câu này chọn tối đa ${max} thôi nhé.`, "err"); return;
+    }
+    updateProgress(); saveLocal();
+  });
+  f.addEventListener("input", () => { updateProgress(); saveLocal(); });
+}
+render(); bind();
+try { const s = localStorage.getItem(LSKEY); if (s){ restore(JSON.parse(s)); showStatus("Đã mở lại phần đã điền dở.", "info"); } } catch(e){}
+updateProgress();
+</script>
+</body>
+</html>
