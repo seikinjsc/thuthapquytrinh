@@ -88,6 +88,8 @@
     Câu nào không biết thì ghi "không biết". Có thể làm từng phần, mỗi lần vài phút.
   </div>
 
+  <div id="js-loi" class="status err" style="display:block">⚠ Trình duyệt này chưa chạy được phiếu (nếu ô "Ngày điền" ở câu 2 không tự có ngày hôm nay là bị lỗi này).
+    Chị mở lại link bằng <b>Chrome</b> hoặc <b>Safari</b>. Nếu đã lỡ điền: <b>đừng tải lại trang</b> — chụp màn hình từng đoạn gửi qua Zalo.</div>
   <div id="status" class="status"></div>
 
   <!-- ===== 1 ===== -->
@@ -358,10 +360,12 @@
       <div class="section-header"><h2 class="section-title">Kết quả — gửi phần này về</h2>
         <p class="section-desc">Chị bấm <b>Tải JSON</b> rồi gửi file qua Zalo cho anh Hiến (tốt nhất), hoặc bấm <b>Copy</b> rồi dán vào Zalo.</p></div>
       <div class="section-body">
-        <pre id="export-box"></pre>
+        <textarea id="export-box" readonly style="min-height:260px;font-size:13px;background:#0f172a;color:#e2e8f0"></textarea>
+        <p class="hint" style="margin-top:6px">Nút nào không chạy thì chị <b>nhấn giữ vào khung trên → Chọn tất cả → Sao chép</b> rồi dán vào Zalo.</p>
         <div class="row">
-          <button onclick="taiJSON()">⬇ Tải JSON</button>
+          <button class="primary" id="nut-chia-se" onclick="chiaSe()" style="display:none">📤 Gửi qua Zalo</button>
           <button onclick="copyText()">📋 Copy</button>
+          <button onclick="taiJSON()">⬇ Tải file</button>
         </div>
       </div>
     </div>
@@ -411,8 +415,9 @@ function luu(){
 }
 function nhan(id){
   // Ô đơn có label[for]; nhóm radio/checkbox lấy tiêu đề câu (label.f) của khối chứa nó.
-  const l = document.querySelector(`label[for="${id}"]`)
-    || document.querySelector(`input[name="${id}"]`)?.closest('.field')?.querySelector('label.f');
+  // Không dùng ?. — WebView cũ không hiểu, lỗi cú pháp làm chết cả phiếu (chị Tuyết 02/10).
+  let l = document.querySelector(`label[for="${id}"]`);
+  if (!l) { const o = document.querySelector(`input[name="${id}"]`); const f = o && o.closest('.field'); l = f && f.querySelector('label.f'); }
   return l ? l.textContent.replace(/\s+/g, ' ').trim() : id;
 }
 function vanBan(d){
@@ -431,7 +436,8 @@ function bao(msg, loai){
 function xuat(){
   if (!document.getElementById('ho_ten').value.trim()) { bao('Chị điền họ tên ở câu 1 trước đã nhé.', 'err'); scrollTo({top: 0, behavior: 'smooth'}); return; }
   luu();
-  document.getElementById('export-box').textContent = vanBan(collect());
+  document.getElementById('export-box').value = vanBan(collect()) + '\n\n--- JSON ---\n' + JSON.stringify(collect());
+  if (navigator.share) document.getElementById('nut-chia-se').style.display = '';
   const a = document.getElementById('export-area'); a.style.display = 'block'; a.scrollIntoView({behavior: 'smooth'});
   const [n, t] = soDaTraLoi();
   bao(n < t ? `Đã xuất. Còn ${t - n} câu để trống — chị gửi luôn cũng được, để trống cũng là thông tin.` : 'Đã xuất đủ. Chị tải JSON gửi về nhé.', 'ok');
@@ -443,11 +449,18 @@ function taiJSON(){
   a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], {type: 'application/json'}));
   a.download = `seikin_kenh-vn_${ten}_${d.ngay || new Date().toISOString().slice(0, 10)}.json`;
   a.click();
+  bao('Nếu không thấy file tải về (hay gặp khi mở trong Zalo), chị bấm Copy rồi dán vào Zalo nhé.', 'info');
 }
 function copyText(){
-  navigator.clipboard.writeText(document.getElementById('export-box').textContent)
-    .then(() => bao('Đã copy. Dán vào Zalo gửi về nhé.', 'ok'))
-    .catch(() => bao('Không copy tự động được — bôi đen đoạn trên rồi copy tay nhé.', 'err'));
+  const o = document.getElementById('export-box');
+  const lui = () => { o.focus(); o.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(e) {}
+    bao(ok ? 'Đã copy. Chị dán vào Zalo gửi về nhé.' : 'Máy không cho copy tự động — chị nhấn giữ vào khung → Chọn tất cả → Sao chép.', ok ? 'ok' : 'err'); };
+  if (navigator.clipboard) navigator.clipboard.writeText(o.value).then(() => bao('Đã copy. Chị dán vào Zalo gửi về nhé.', 'ok'), lui); else lui();
+}
+// Chia sẻ thẳng sang Zalo/Messenger — không cần tải file (trình duyệt trong Zalo hay chặn tải file).
+function chiaSe(){
+  navigator.share({ title: 'Phiếu xây kênh — Seikin', text: document.getElementById('export-box').value })
+    .catch(() => bao('Chưa gửi được — chị bấm Copy rồi dán vào Zalo nhé.', 'err'));
 }
 function xoaHet(){
   if (!confirm('Xoá hết những gì đã điền?')) return;
@@ -455,6 +468,7 @@ function xoaHet(){
   location.reload();
 }
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('js-loi').style.display = 'none';
   document.getElementById('ngay').value = new Date().toISOString().slice(0, 10);
   let s = null; try { s = localStorage.getItem(LSKEY); } catch(e) {}
   if (s) { try { const d = JSON.parse(s); restore(d); bao('Đã mở lại phần đang điền dở.', 'info'); } catch(e) {} }
