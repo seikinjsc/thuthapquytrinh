@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Phiếu kinh nghiệm ca khó — Seikin</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#1a1d23; --muted:#6b7280; --line:#e3e6ea;
+    --brand:#0f766e; --brand-soft:#e6f4f1; --warn:#b45309; --warn-soft:#fef3c7;
+    --ok:#15803d; --ok-soft:#dcfce7; --err:#b91c1c; --err-soft:#fee2e2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    padding-bottom:90px}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--brand);color:#fff;padding:22px 16px 18px}
+  header .wrap{padding:0}
+  h1{margin:0 0 6px;font-size:21px;line-height:1.3}
+  header p{margin:0;opacity:.9;font-size:14px}
+  .progress-track{height:4px;background:rgba(255,255,255,.25);margin-top:14px;border-radius:2px;overflow:hidden}
+  .progress-bar{height:100%;width:0;background:#fff;transition:width .3s}
+  .section{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden}
+  .section-header{padding:14px 16px;border-bottom:1px solid var(--line);background:#fafbfc}
+  .section-title{margin:0;font-size:16px;font-weight:650}
+  .section-desc{margin:5px 0 0;font-size:13.5px;color:var(--muted)}
+  .section-body{padding:16px}
+  .time{display:inline-block;background:var(--brand-soft);color:var(--brand);
+    font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  label.f{display:block;font-weight:600;margin:0 0 6px;font-size:14.5px}
+  .num{color:var(--brand);font-weight:700;margin-right:4px}
+  .hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .opt{display:block;padding:8px 11px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14.5px}
+  .opt:hover{background:#fafbfc}
+  .opt input{margin-right:8px}
+  .opt:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+  input[type=text],input[type=date],input[type=number],textarea,select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+  textarea{min-height:80px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--brand);outline-offset:-1px;border-color:var(--brand)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:150px}
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:11px 13px;
+    border-radius:0 8px 8px 0;font-size:14px;margin:0 0 16px}
+  .plat{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+  .plat h3{margin:0 0 8px;font-size:15px}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  button{font:inherit;font-size:14.5px;font-weight:600;padding:11px 16px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  button.ghost{color:var(--muted)}
+  .badge{position:fixed;top:14px;right:14px;background:var(--ok);color:#fff;padding:6px 12px;
+    border-radius:99px;font-size:13px;opacity:0;transform:translateY(-8px);transition:.25s;pointer-events:none}
+  .badge.show{opacity:1;transform:none}
+  .status{display:none;padding:11px 13px;border-radius:9px;margin:14px 0;font-size:14px}
+  .status.ok{background:var(--ok-soft);color:var(--ok)}
+  .status.err{background:var(--err-soft);color:var(--err)}
+  .status.info{background:var(--brand-soft);color:var(--brand)}
+  #export-area{display:none}
+  pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:9px;overflow-x:auto;
+    font-size:12.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Phiếu kinh nghiệm ca khó — Seikin</h1>
+<p>Khoảng 30–40 phút, chia 5 phần · làm dở bỏ đó được, máy tự lưu trên điện thoại này</p>
+<div class="progress-track"><div class="progress-bar" id="progress"></div></div></div></header>
+<div class="wrap">
+<div class="note"><b>Phiếu này để đưa kinh nghiệm thật của người làm hồ sơ vào kho kiến thức</b> — nhân viên mới, bot fanpage
+và bài viết sẽ dùng lại. Hệ thống chỉ ghi được ngày tháng, <b>không ghi được đã gỡ ca khó thế nào</b> — phần đó chỉ người đã làm mới biết.
+Câu nào không biết thì <b>tick "Không biết"</b>, anh Hiến sẽ bổ sung. Không ghi tên khách, số giấy tờ.</div>
+<div id="js-loi" class="status err" style="display:block">⚠ Trình duyệt này chưa chạy được phiếu (ô "Ngày điền" ở câu 2 không tự có ngày hôm nay là bị lỗi này).
+Mở lại link bằng <b>Chrome</b> hoặc <b>Safari</b>. Nếu đã lỡ điền: <b>đừng tải lại trang</b> — chụp màn hình gửi qua Zalo.</div>
+<div id="status" class="status"></div>
+<div class="section"><div class="section-header"><h2 class="section-title">Phần 1 — Người điền<span class="time">~1 phút</span></h2><p class="section-desc">Để biết câu trả lời đến từ vị trí nào.</p></div><div class="section-body"><div class="row"><div class="field"><label class="f" for="ho_ten"><span class="num">1.</span>Họ tên</label><input type="text" id="ho_ten" data-q></div><div class="field"><label class="f" for="ngay"><span class="num">2.</span>Ngày điền</label><input type="date" id="ngay" data-q></div></div><div class="field"><label class="f"><span class="num">3.</span>Việc chính đang làm ở Seikin</label><label class="opt"><input type="radio" name="viec_chinh" value="tu_van">Tư vấn khách</label><label class="opt"><input type="radio" name="viec_chinh" value="ho_so_jp">Làm hồ sơ phía Nhật</label><label class="opt"><input type="radio" name="viec_chinh" value="ho_so_vn">Làm hồ sơ phía Việt Nam</label><label class="opt"><input type="radio" name="viec_chinh" value="phat_sinh">Xử lý phát sinh</label><label class="opt"><input type="radio" name="viec_chinh" value="nhieu">Nhiều việc</label></div><div class="field"><label class="f" for="nam_kinh_nghiem"><span class="num">4.</span>Làm nghề nenkin/thuế được bao lâu (kể cả trước khi vào Seikin)?</label><textarea id="nam_kinh_nghiem" data-q rows="1"></textarea></div></div></div>
+<div class="section"><div class="section-header"><h2 class="section-title">Phần 2 — 4 ca cụ thể<span class="time">~15 phút</span></h2><p class="section-desc">Mã đơn anh Hiến gửi riêng qua Zalo. Ca nào không nhớ thì chọn 'Không — bỏ qua'.</p></div><div class="section-body"><div class="plat"><h3>Ca 1 — Bộ đội + mất sổ + chưa cắt cư trú</h3><p class="hint">Nhận 04/2025, <b>nộp khi visa còn hạn</b> · gửi 24/04/2025 · có kết quả 15/07/2026 (~15 tháng). Mã đơn: anh Hiến gửi riêng qua Zalo.</p><div class="field"><label class="f"><span class="num">5.</span>Có nhớ / tra lại được ca này không?</label><label class="opt"><input type="radio" name="ca1_nho" value="co">Có</label><label class="opt"><input type="radio" name="ca1_nho" value="tra_lai">Tra lại trên hệ thống được</label><label class="opt"><input type="radio" name="ca1_nho" value="khong">Không — bỏ qua ca này</label></div><div class="field"><label class="f" for="ca1_luc_nhan"><span class="num">6.</span>Lúc nhận: khách thiếu gì, đang ở đâu (Nhật hay VN), đã tự làm / nhờ nơi khác trước chưa?</label><textarea id="ca1_luc_nhan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca1_luc_nhan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca1_go"><span class="num">7.</span>Đã gỡ bằng cách nào? Giấy thay thế gì, xin ở cơ quan nào, ai làm, mất bao lâu?</label><textarea id="ca1_go" data-q rows="4"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca1_go_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca1_co_quan"><span class="num">8.</span>Cơ quan Nhật có hỏi lại / trả hồ sơ không? Vì lý do gì?</label><textarea id="ca1_co_quan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca1_co_quan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f"><span class="num">9.</span>Kết quả cuối cùng</label><label class="opt"><input type="radio" name="ca1_ket_qua" value="du">Được chi trả đủ</label><label class="opt"><input type="radio" name="ca1_ket_qua" value="mot_phan">Được một phần</label><label class="opt"><input type="radio" name="ca1_ket_qua" value="tu_choi">Bị từ chối</label><label class="opt"><input type="radio" name="ca1_ket_qua" value="khong_biet">Không biết</label></div><div class="field"><label class="f" for="ca1_bai_hoc"><span class="num">10.</span>Lần sau gặp ca y hệt, nên làm khác điều gì?</label><textarea id="ca1_bai_hoc" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca1_bai_hoc_kb" value="khong_biet">Không biết / chưa gặp</label></div></div><div class="plat"><h3>Ca 2 — Mất sổ + chưa cắt cư trú, phải GỬI LẠI</h3><p class="hint">Gửi lần đầu 14/06/2025 · <b>gửi lại</b> 25/04/2026 · có kết quả 15/07/2026. Mã đơn: anh Hiến gửi riêng qua Zalo.</p><div class="field"><label class="f"><span class="num">11.</span>Có nhớ / tra lại được ca này không?</label><label class="opt"><input type="radio" name="ca2_nho" value="co">Có</label><label class="opt"><input type="radio" name="ca2_nho" value="tra_lai">Tra lại trên hệ thống được</label><label class="opt"><input type="radio" name="ca2_nho" value="khong">Không — bỏ qua ca này</label></div><div class="field"><label class="f" for="ca2_luc_nhan"><span class="num">12.</span>Lúc nhận: khách thiếu gì, đang ở đâu (Nhật hay VN), đã tự làm / nhờ nơi khác trước chưa?</label><textarea id="ca2_luc_nhan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca2_luc_nhan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca2_go"><span class="num">13.</span>Đã gỡ bằng cách nào? Giấy thay thế gì, xin ở cơ quan nào, ai làm, mất bao lâu?</label><textarea id="ca2_go" data-q rows="4"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca2_go_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca2_co_quan"><span class="num">14.</span>Cơ quan Nhật có hỏi lại / trả hồ sơ không? Vì lý do gì?</label><textarea id="ca2_co_quan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca2_co_quan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f"><span class="num">15.</span>Kết quả cuối cùng</label><label class="opt"><input type="radio" name="ca2_ket_qua" value="du">Được chi trả đủ</label><label class="opt"><input type="radio" name="ca2_ket_qua" value="mot_phan">Được một phần</label><label class="opt"><input type="radio" name="ca2_ket_qua" value="tu_choi">Bị từ chối</label><label class="opt"><input type="radio" name="ca2_ket_qua" value="khong_biet">Không biết</label></div><div class="field"><label class="f" for="ca2_bai_hoc"><span class="num">16.</span>Lần sau gặp ca y hệt, nên làm khác điều gì?</label><textarea id="ca2_bai_hoc" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca2_bai_hoc_kb" value="khong_biet">Không biết / chưa gặp</label></div></div><div class="plat"><h3>Ca 3 — Mất hộ chiếu (kèm bộ đội)</h3><p class="hint">Gửi 23/10/2025 · 01/2026 <b>cục trả hồ sơ, đòi bổ sung giấy tờ hộ chiếu</b> · có kết quả 15/05/2026 (~7 tháng). Mã đơn: anh Hiến gửi riêng qua Zalo.</p><div class="field"><label class="f"><span class="num">17.</span>Có nhớ / tra lại được ca này không?</label><label class="opt"><input type="radio" name="ca3_nho" value="co">Có</label><label class="opt"><input type="radio" name="ca3_nho" value="tra_lai">Tra lại trên hệ thống được</label><label class="opt"><input type="radio" name="ca3_nho" value="khong">Không — bỏ qua ca này</label></div><div class="field"><label class="f" for="ca3_luc_nhan"><span class="num">18.</span>Lúc nhận: khách thiếu gì, đang ở đâu (Nhật hay VN), đã tự làm / nhờ nơi khác trước chưa?</label><textarea id="ca3_luc_nhan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca3_luc_nhan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca3_go"><span class="num">19.</span>Đã gỡ bằng cách nào? Giấy thay thế gì, xin ở cơ quan nào, ai làm, mất bao lâu?</label><textarea id="ca3_go" data-q rows="4"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca3_go_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca3_co_quan"><span class="num">20.</span>Cơ quan Nhật có hỏi lại / trả hồ sơ không? Vì lý do gì?</label><textarea id="ca3_co_quan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca3_co_quan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f"><span class="num">21.</span>Kết quả cuối cùng</label><label class="opt"><input type="radio" name="ca3_ket_qua" value="du">Được chi trả đủ</label><label class="opt"><input type="radio" name="ca3_ket_qua" value="mot_phan">Được một phần</label><label class="opt"><input type="radio" name="ca3_ket_qua" value="tu_choi">Bị từ chối</label><label class="opt"><input type="radio" name="ca3_ket_qua" value="khong_biet">Không biết</label></div><div class="field"><label class="f" for="ca3_bai_hoc"><span class="num">22.</span>Lần sau gặp ca y hệt, nên làm khác điều gì?</label><textarea id="ca3_bai_hoc" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca3_bai_hoc_kb" value="khong_biet">Không biết / chưa gặp</label></div></div><div class="plat"><h3>Ca 4 — Chưa cắt cư trú, QUÁ HẠN 2 NĂM vẫn gửi</h3><p class="hint">Khách cọc 03/2025 dù quá hạn 2 năm · gửi 06/03/2025 · 03/2026 "đã xét xong chờ giấy báo" · có kết quả 15/05/2026. Mã đơn: anh Hiến gửi riêng qua Zalo.</p><div class="field"><label class="f"><span class="num">23.</span>Có nhớ / tra lại được ca này không?</label><label class="opt"><input type="radio" name="ca4_nho" value="co">Có</label><label class="opt"><input type="radio" name="ca4_nho" value="tra_lai">Tra lại trên hệ thống được</label><label class="opt"><input type="radio" name="ca4_nho" value="khong">Không — bỏ qua ca này</label></div><div class="field"><label class="f" for="ca4_luc_nhan"><span class="num">24.</span>Lúc nhận: khách thiếu gì, đang ở đâu (Nhật hay VN), đã tự làm / nhờ nơi khác trước chưa?</label><textarea id="ca4_luc_nhan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca4_luc_nhan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca4_go"><span class="num">25.</span>Đã gỡ bằng cách nào? Giấy thay thế gì, xin ở cơ quan nào, ai làm, mất bao lâu?</label><textarea id="ca4_go" data-q rows="4"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca4_go_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca4_co_quan"><span class="num">26.</span>Cơ quan Nhật có hỏi lại / trả hồ sơ không? Vì lý do gì?</label><textarea id="ca4_co_quan" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca4_co_quan_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f"><span class="num">27.</span>Kết quả cuối cùng</label><label class="opt"><input type="radio" name="ca4_ket_qua" value="du">Được chi trả đủ</label><label class="opt"><input type="radio" name="ca4_ket_qua" value="mot_phan">Được một phần</label><label class="opt"><input type="radio" name="ca4_ket_qua" value="tu_choi">Bị từ chối</label><label class="opt"><input type="radio" name="ca4_ket_qua" value="khong_biet">Không biết</label></div><div class="field"><label class="f" for="ca4_bai_hoc"><span class="num">28.</span>Lần sau gặp ca y hệt, nên làm khác điều gì?</label><textarea id="ca4_bai_hoc" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca4_bai_hoc_kb" value="khong_biet">Không biết / chưa gặp</label></div></div><div class="field"><label class="f" for="ca4_vi_sao"><span class="num">29.</span>Riêng ca 4: quá hạn 2 năm mà vẫn có kết quả — vì sao? (hạn tính từ ngày nào, cục xử lý thế nào)</label><textarea id="ca4_vi_sao" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca4_vi_sao_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="ca5"><span class="num">30.</span>Ca thứ 5: kể một ca PHÁT SINH SAU KHI ĐÃ GỬI mà bạn nhớ rõ (đổi tài khoản, cục trả hồ sơ, sai thông tin…) — chuyện gì, gỡ thế nào, mất bao lâu</label><textarea id="ca5" data-q rows="5"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="ca5_kb" value="khong_biet">Không biết / chưa gặp</label></div></div></div>
+<div class="section"><div class="section-header"><h2 class="section-title">Phần 3 — Kinh nghiệm theo tình huống khó<span class="time">~12 phút</span></h2><p class="section-desc">Không cần nhớ ca cụ thể — viết cách thường làm.</p></div><div class="section-body"><p class="hint">Viết theo kinh nghiệm thật, không cần tra. Mỗi tình huống 3 ý: làm thế nào · thường mất bao lâu · bẫy hay gặp.</p><div class="plat"><h3>Mất sổ nenkin / không nhớ 基礎年金番号</h3><div class="field"><label class="f" for="th_ms_cach"><span class="num">31.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_ms_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_ms_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_ms_lau"><span class="num">32.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_ms_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_ms_bay"><span class="num">33.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_ms_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Mất hộ chiếu (hộ chiếu có dấu xuất cảnh)</h3><div class="field"><label class="f" for="th_mhc_cach"><span class="num">34.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_mhc_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_mhc_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_mhc_lau"><span class="num">35.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_mhc_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_mhc_bay"><span class="num">36.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_mhc_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Chưa cắt cư trú (chưa làm 転出届) khi đã về VN</h3><div class="field"><label class="f" for="th_cct_cach"><span class="num">37.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_cct_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_cct_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_cct_lau"><span class="num">38.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_cct_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_cct_bay"><span class="num">39.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_cct_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Bộ đội (còn ở Nhật, cư trú bất hợp pháp)</h3><div class="field"><label class="f" for="th_bd_cach"><span class="num">40.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_bd_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_bd_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_bd_lau"><span class="num">41.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_bd_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_bd_bay"><span class="num">42.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_bd_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Quá hạn 2 năm kể từ khi rời Nhật</h3><div class="field"><label class="f" for="th_qua_han_cach"><span class="num">43.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_qua_han_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_qua_han_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_qua_han_lau"><span class="num">44.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_qua_han_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_qua_han_bay"><span class="num">45.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_qua_han_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Đổi tài khoản / ngân hàng sau khi đã gửi hồ sơ</h3><div class="field"><label class="f" for="th_doi_tk_cach"><span class="num">46.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_doi_tk_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_doi_tk_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_doi_tk_lau"><span class="num">47.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_doi_tk_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_doi_tk_bay"><span class="num">48.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_doi_tk_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Mất giấy báo kết quả lần 1 (làm lần 2)</h3><div class="field"><label class="f" for="th_mat_giay_bao_cach"><span class="num">49.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_mat_giay_bao_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_mat_giay_bao_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_mat_giay_bao_lau"><span class="num">50.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_mat_giay_bao_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_mat_giay_bao_bay"><span class="num">51.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_mat_giay_bao_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Công ty cũ không giao 源泉徴収票 / công ty đã giải thể</h3><div class="field"><label class="f" for="th_gensen_ct_cach"><span class="num">52.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_gensen_ct_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_gensen_ct_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_gensen_ct_lau"><span class="num">53.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_gensen_ct_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_gensen_ct_bay"><span class="num">54.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_gensen_ct_bay" data-q rows="3"></textarea></div></div><div class="plat"><h3>Hồ sơ thai sản khi mẹ về Việt Nam sinh</h3><div class="field"><label class="f" for="th_ts_vn_cach"><span class="num">55.</span>Cách làm thực tế (giấy gì, gửi cơ quan nào, ai làm)</label><textarea id="th_ts_vn_cach" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="th_ts_vn_cach_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="th_ts_vn_lau"><span class="num">56.</span>Thường mất bao lâu so với hồ sơ bình thường?</label><textarea id="th_ts_vn_lau" data-q rows="1"></textarea></div><div class="field"><label class="f" for="th_ts_vn_bay"><span class="num">57.</span>Bẫy / lỗi hay gặp khiến hồ sơ bị trả hoặc chậm</label><textarea id="th_ts_vn_bay" data-q rows="3"></textarea></div></div></div></div>
+<div class="section"><div class="section-header"><h2 class="section-title">Phần 4 — Câu văn bản Nhật không trả lời được<span class="time">~6 phút</span></h2><p class="section-desc">Phần quý nhất: chỉ người làm thật mới biết.</p></div><div class="section-body"><p class="hint">Đây là các câu Seikin đã tra văn bản chính thức của Nhật mà <b>không tìm ra câu trả lời</b>. Kinh nghiệm thật của người làm là nguồn duy nhất.</p><div class="field"><label class="f" for="cq_no_nenkin"><span class="num">58.</span>Khách còn NỢ phí 国民年金 khi rút nenkin: có bị trừ vào tiền, bị truy thu, hay không sao?</label><textarea id="cq_no_nenkin" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_no_nenkin_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="cq_kentaikyo_vn"><span class="num">59.</span>Khách đã về VN mới hỏi rút Kentaikyō (建退共): có làm được không, làm thế nào?</label><textarea id="cq_kentaikyo_vn" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_kentaikyo_vn_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="cq_that_nghiep"><span class="num">60.</span>Khách về nước hẳn rồi có nhận được trợ cấp thất nghiệp không? Từng gặp ca nào chưa?</label><textarea id="cq_that_nghiep" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_that_nghiep_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="cq_ikukyu_vn"><span class="num">61.</span>Mẹ đang nghỉ ikukyu mà về VN ở với con: có nhận tiếp trợ cấp được không? Từng gặp chưa?</label><textarea id="cq_ikukyu_vn" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_ikukyu_vn_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="cq_ho_chieu"><span class="num">62.</span>Mất hộ chiếu: cục chấp nhận giấy gì thay thế (hộ chiếu mới, giấy xác nhận xuất cảnh…)?</label><textarea id="cq_ho_chieu" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_ho_chieu_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="cq_tra_so"><span class="num">63.</span>Mất hết giấy tờ, không biết 基礎年金番号: tra số bằng cách nào khi khách đang ở VN?</label><textarea id="cq_tra_so" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_tra_so_kb" value="khong_biet">Không biết / chưa gặp</label></div><div class="field"><label class="f" for="cq_giay_bao"><span class="num">64.</span>Giấy báo lần 1 về sau tiền bao lâu theo thực tế (cục gửi cùng lúc chuyển tiền — nhưng tới tay khách ở VN mất bao lâu)?</label><textarea id="cq_giay_bao" data-q rows="3"></textarea><label class="opt" style="margin-top:6px"><input type="checkbox" name="cq_giay_bao_kb" value="khong_biet">Không biết / chưa gặp</label></div></div></div>
+<div class="section"><div class="section-header"><h2 class="section-title">Phần 5 — Khách và mùa<span class="time">~4 phút</span></h2><p class="section-desc">Để lên lịch bài viết đúng lúc.</p></div><div class="section-body"><div class="field"><label class="f" for="mua_dong"><span class="num">65.</span>Tháng nào khách hỏi / nộp nhiều nhất trong năm? Vì sao?</label><textarea id="mua_dong" data-q rows="3"></textarea></div><div class="field"><label class="f" for="cau_bot_chua_tra_loi"><span class="num">66.</span>Khách hay hỏi câu gì mà bạn thấy khó trả lời / chưa có câu chuẩn?</label><textarea id="cau_bot_chua_tra_loi" data-q rows="4"></textarea></div><div class="field"><label class="f" for="uoc_khach_biet"><span class="num">67.</span>Một điều bạn ƯỚC khách biết trước khi nộp hồ sơ (để đỡ mất thời gian cả hai bên)?</label><textarea id="uoc_khach_biet" data-q rows="3"></textarea></div><div class="field"><label class="f" for="them"><span class="num">68.</span>Còn gì muốn bổ sung không?</label><textarea id="them" data-q rows="3"></textarea></div></div></div>
+<div id="export-area"><div class="section"><div class="section-header"><h2 class="section-title">Kết quả — gửi phần này về</h2>
+<p class="section-desc">Bấm <b>Gửi qua Zalo</b> chọn anh Hiến, hoặc <b>Copy</b> rồi dán vào Zalo.</p></div><div class="section-body">
+<textarea id="export-box" readonly style="min-height:260px;font-size:13px;background:#0f172a;color:#e2e8f0"></textarea>
+<p class="hint" style="margin-top:6px">Nút nào không chạy thì <b>nhấn giữ vào khung trên → Chọn tất cả → Sao chép</b> rồi dán vào Zalo.</p>
+<div class="row"><button class="primary" id="nut-chia-se" onclick="chiaSe()" style="display:none">📤 Gửi qua Zalo</button>
+<button onclick="copyText()">📋 Copy</button><button onclick="taiJSON()">⬇ Tải file</button></div></div></div></div>
+</div>
+<div class="badge" id="saved-badge">✓ Đã lưu</div>
+<div class="bar"><button class="primary" onclick="xuat()">Xong — xuất kết quả</button><button class="ghost" onclick="xoaHet()">Xoá hết</button></div>
+<script>
+const LSKEY = 'seikin_ca_kho_v1';
+const FORM = 'CA-KHO';
+// Mọi ô có data-q (id) + mọi nhóm radio/checkbox (name) — tự gom, thêm câu không phải sửa JS.
+const ids = () => [...document.querySelectorAll('[data-q]')].map(e => e.id);
+const nhom = () => [...new Set([...document.querySelectorAll('input[type=radio],input[type=checkbox]')].map(e => e.name))];
+
+function collect(){
+ const d = { _form: FORM, _version: 1, _saved: new Date().toISOString() };
+ ids().forEach(id => d[id] = document.getElementById(id).value || '');
+ nhom().forEach(n => {
+  const chon = [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
+  d[n] = document.querySelector(`input[name="${n}"]`).type === 'radio' ? (chon[0] || '') : chon;
+ });
+ return d;
+}
+function restore(d){
+ ids().forEach(id => { if (d[id] != null) document.getElementById(id).value = d[id]; });
+ nhom().forEach(n => {
+  const v = [].concat(d[n] || []);
+  document.querySelectorAll(`input[name="${n}"]`).forEach(e => e.checked = v.includes(e.value));
+ });
+}
+function soDaTraLoi(){
+ const d = collect(); let n = 0, tong = 0;
+ for (const [k, v] of Object.entries(d)) { if (k.startsWith('_')) continue; tong++; if (Array.isArray(v) ? v.length : String(v).trim()) n++; }
+ return [n, tong];
+}
+function capNhat(){ const [n, t] = soDaTraLoi(); document.getElementById('progress').style.width = (n / t * 100) + '%'; }
+function luu(){
+ try { localStorage.setItem(LSKEY, JSON.stringify(collect())); } catch(e) { return; }
+ const b = document.getElementById('saved-badge'); b.classList.add('show'); setTimeout(() => b.classList.remove('show'), 1500);
+}
+function nhan(id){
+ // Ô đơn có label[for]; nhóm radio/checkbox lấy tiêu đề câu (label.f) của khối chứa nó.
+ // Không dùng ?. — WebView cũ không hiểu, lỗi cú pháp làm chết cả phiếu ( Tuyết 02/10).
+ let l = document.querySelector(`label[for="${id}"]`);
+ if (!l) { const o = document.querySelector(`input[name="${id}"]`); const f = o && o.closest('.field'); l = f && f.querySelector('label.f'); }
+ return l ? l.textContent.replace(/\s+/g, ' ').trim() : id;
+}
+function vanBan(d){
+ const dong = [`=== PHIẾU KINH NGHIỆM CA KHÓ — SEIKIN ===`];
+ for (const [k, v] of Object.entries(d)) {
+  if (k.startsWith('_')) continue;
+  const gt = Array.isArray(v) ? (v.length ? v.join(', ') : '—') : (String(v).trim() || '—');
+  dong.push(`• ${nhan(k)}: ${gt}`);
+ }
+ return dong.join('\n');
+}
+function bao(msg, loai){
+ const el = document.getElementById('status'); el.className = 'status ' + loai; el.textContent = msg; el.style.display = 'block';
+ if (loai === 'ok') setTimeout(() => el.style.display = 'none', 5000);
+}
+function xuat(){
+ if (!document.getElementById('ho_ten').value.trim()) { bao('Điền họ tên ở câu 1 trước đã nhé.', 'err'); scrollTo({top: 0, behavior: 'smooth'}); return; }
+ luu();
+ document.getElementById('export-box').value = vanBan(collect()) + '\n\n--- JSON ---\n' + JSON.stringify(collect());
+ if (navigator.share) document.getElementById('nut-chia-se').style.display = '';
+ const a = document.getElementById('export-area'); a.style.display = 'block'; a.scrollIntoView({behavior: 'smooth'});
+ const [n, t] = soDaTraLoi();
+ bao(n < t ? `Đã xuất. Còn ${t - n} câu để trống — gửi luôn cũng được — câu nào không biết anh Hiến sẽ bổ sung.` : 'Đã xuất đủ. Bấm Gửi qua Zalo hoặc Copy gửi anh Hiến nhé.', 'ok');
+}
+function taiJSON(){
+ const d = collect();
+ const ten = (d.ho_ten || 'nhanvien').trim().replace(/\s+/g, '_');
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], {type: 'application/json'}));
+ a.download = `seikin_ca-kho_${ten}_${d.ngay || new Date().toISOString().slice(0, 10)}.json`;
+ a.click();
+ bao('Nếu không thấy file tải về (hay gặp khi mở trong Zalo), bấm Copy rồi dán vào Zalo nhé.', 'info');
+}
+function copyText(){
+ const o = document.getElementById('export-box');
+ const lui = () => { o.focus(); o.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(e) {}
+  bao(ok ? 'Đã copy. Chị dán vào Zalo gửi về nhé.' : 'Máy không cho copy tự động — nhấn giữ vào khung → Chọn tất cả → Sao chép.', ok ? 'ok' : 'err'); };
+ if (navigator.clipboard) navigator.clipboard.writeText(o.value).then(() => bao('Đã copy. Chị dán vào Zalo gửi về nhé.', 'ok'), lui); else lui();
+}
+// Chia sẻ thẳng sang Zalo/Messenger — không cần tải file (trình duyệt trong Zalo hay chặn tải file).
+function chiaSe(){
+ navigator.share({ title: 'Phiếu kinh nghiệm ca khó — Seikin', text: document.getElementById('export-box').value })
+  .catch(() => bao('Chưa gửi được — bấm Copy rồi dán vào Zalo nhé.', 'err'));
+}
+function xoaHet(){
+ if (!confirm('Xoá hết những gì đã điền?')) return;
+ try { localStorage.removeItem(LSKEY); } catch(e) {}
+ location.reload();
+}
+document.addEventListener('DOMContentLoaded', () => {
+ document.getElementById('js-loi').style.display = 'none';
+ document.getElementById('ngay').value = new Date().toISOString().slice(0, 10);
+ let s = null; try { s = localStorage.getItem(LSKEY); } catch(e) {}
+ if (s) { try { const d = JSON.parse(s); restore(d); bao('Đã mở lại phần đang điền dở.', 'info'); } catch(e) {} }
+ document.querySelectorAll('input,select,textarea').forEach(el => {
+  el.addEventListener('input', () => { capNhat(); luu(); });
+  el.addEventListener('change', () => { capNhat(); luu(); });
+ });
+ capNhat();
+});
+</script>
+</body>
+</html>
