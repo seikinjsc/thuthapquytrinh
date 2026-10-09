@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Phiếu xây kênh — Seikin</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#1a1d23; --muted:#6b7280; --line:#e3e6ea;
+    --brand:#0f766e; --brand-soft:#e6f4f1; --warn:#b45309; --warn-soft:#fef3c7;
+    --ok:#15803d; --ok-soft:#dcfce7; --err:#b91c1c; --err-soft:#fee2e2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    padding-bottom:90px}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  header{background:var(--brand);color:#fff;padding:22px 16px 18px}
+  header .wrap{padding:0}
+  h1{margin:0 0 6px;font-size:21px;line-height:1.3}
+  header p{margin:0;opacity:.9;font-size:14px}
+  .progress-track{height:4px;background:rgba(255,255,255,.25);margin-top:14px;border-radius:2px;overflow:hidden}
+  .progress-bar{height:100%;width:0;background:#fff;transition:width .3s}
+  .section{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden}
+  .section-header{padding:14px 16px;border-bottom:1px solid var(--line);background:#fafbfc}
+  .section-title{margin:0;font-size:16px;font-weight:650}
+  .section-desc{margin:5px 0 0;font-size:13.5px;color:var(--muted)}
+  .section-body{padding:16px}
+  .time{display:inline-block;background:var(--brand-soft);color:var(--brand);
+    font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  label.f{display:block;font-weight:600;margin:0 0 6px;font-size:14.5px}
+  .num{color:var(--brand);font-weight:700;margin-right:4px}
+  .hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .opt{display:block;padding:8px 11px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14.5px}
+  .opt:hover{background:#fafbfc}
+  .opt input{margin-right:8px}
+  .opt:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+  input[type=text],input[type=date],input[type=number],textarea,select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+  textarea{min-height:80px;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--brand);outline-offset:-1px;border-color:var(--brand)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:150px}
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:11px 13px;
+    border-radius:0 8px 8px 0;font-size:14px;margin:0 0 16px}
+  .plat{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+  .plat h3{margin:0 0 8px;font-size:15px}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:10px 16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  button{font:inherit;font-size:14.5px;font-weight:600;padding:11px 16px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  button.ghost{color:var(--muted)}
+  .badge{position:fixed;top:14px;right:14px;background:var(--ok);color:#fff;padding:6px 12px;
+    border-radius:99px;font-size:13px;opacity:0;transform:translateY(-8px);transition:.25s;pointer-events:none}
+  .badge.show{opacity:1;transform:none}
+  .status{display:none;padding:11px 13px;border-radius:9px;margin:14px 0;font-size:14px}
+  .status.ok{background:var(--ok-soft);color:var(--ok)}
+  .status.err{background:var(--err-soft);color:var(--err)}
+  .status.info{background:var(--brand-soft);color:var(--brand)}
+  #export-area{display:none}
+  pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:9px;overflow-x:auto;
+    font-size:12.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Phiếu xây kênh — Thu Uyên</h1>
+    <p>Seikin · khoảng 30 phút, chia 7 phần · làm dở bỏ đó được, máy tự lưu trên điện thoại này</p>
+    <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="note">
+    <b>Phiếu này để Seikin thiết kế kênh RIÊNG cho bạn</b> — nói với ai, nói chuyện gì, quay kiểu gì, đăng lúc nào —
+    dựa trên đúng con người và chặng đường của bạn. Số liệu nghiệp vụ Seikin soạn sẵn theo luật mới nhất, bạn không cần tra lại.
+    <b>Phần 2 (chuyện lấy nenkin của chính bạn) là phần quý nhất</b> — người xem của kênh chính là người đang đứng ở chỗ bạn đứng mấy tháng trước.
+    Câu nào không biết hoặc không muốn trả lời thì ghi "không biết" / "không". Có thể làm từng phần, mỗi lần vài phút.
+  </div>
+
+  <div id="js-loi" class="status err" style="display:block">⚠ Trình duyệt này chưa chạy được phiếu (nếu ô "Ngày điền" ở câu 2 không tự có ngày hôm nay là bị lỗi này).
+    Bạn mở lại link bằng <b>Chrome</b> hoặc <b>Safari</b>. Nếu đã lỡ điền: <b>đừng tải lại trang</b> — chụp màn hình từng đoạn gửi qua Zalo.</div>
+  <div id="status" class="status"></div>
+
+  <!-- ===== 1 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 1 — Bạn và 3 năm ở Nhật<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Chặng bạn đã đi qua là chặng người xem đang đi — đó là chất liệu thật nhất của kênh.</p>
+    </div>
+    <div class="section-body">
+      <div class="row">
+        <div class="field"><label class="f" for="ho_ten"><span class="num">1.</span>Họ tên</label>
+          <input type="text" id="ho_ten" data-q placeholder="Họ tên thật"></div>
+        <div class="field"><label class="f" for="ngay"><span class="num">2.</span>Ngày điền</label>
+          <input type="date" id="ngay" data-q></div>
+      </div>
+      <div class="field"><label class="f" for="ten_kenh"><span class="num">3.</span>Tên bạn muốn được gọi trên kênh</label>
+        <p class="hint">Ví dụ "Uyên", "Uyên về nước"… Chưa nghĩ ra thì để trống, Seikin sẽ đề xuất.</p>
+        <input type="text" id="ten_kenh" data-q></div>
+      <div class="row">
+        <div class="field"><label class="f" for="noi_song"><span class="num">4.</span>Đang sống ở tỉnh/thành nào?</label>
+          <input type="text" id="noi_song" data-q placeholder="Ví dụ: Hải Dương"></div>
+        <div class="field"><label class="f" for="nam_sinh"><span class="num">5.</span>Năm sinh</label>
+          <p class="hint">Để chọn giọng nói hợp với người xem cùng lứa.</p>
+          <input type="text" id="nam_sinh" data-q placeholder="Ví dụ: 2000"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label class="f" for="nam_sang"><span class="num">6.</span>Sang Nhật tháng/năm nào — về tháng/năm nào?</label>
+          <input type="text" id="nam_sang" data-q placeholder="Ví dụ: 03/2022 – 03/2025"></div>
+        <div class="field"><label class="f" for="tts_nganh"><span class="num">7.</span>Thực tập ngành gì, ở tỉnh nào bên Nhật?</label>
+          <input type="text" id="tts_nganh" data-q placeholder="Ví dụ: chế biến thực phẩm, Aichi"></div>
+      </div>
+      <div class="field"><label class="f"><span class="num">8.</span>Bạn về nước thế nào?</label>
+        <label class="opt"><input type="radio" name="cach_ve" value="het_han">Về đúng hạn hợp đồng thực tập</label>
+        <label class="opt"><input type="radio" name="cach_ve" value="truoc_han">Về trước hạn</label>
+        <label class="opt"><input type="radio" name="cach_ve" value="khac">Khác (ghi ở câu 9)</label>
+      </div>
+      <div class="field"><label class="f" for="tts_nho"><span class="num">9.</span>Ba năm thực tập: chuyện gì bạn nhớ nhất — vui, khổ, hay mất tiền vì không biết?</label>
+        <p class="hint">Kể vài câu như kể cho em gái sắp đi. Ví dụ: lương tháng đầu, bị trừ những khoản gì, gửi tiền về nhà, mấy ngày cuối trước khi bay về.</p>
+        <textarea id="tts_nho" data-q></textarea></div>
+      <div class="field"><label class="f" for="viec_hien_tai"><span class="num">10.</span>Hiện bạn làm gì ở Việt Nam? Một ngày của bạn thế nào?</label>
+        <p class="hint">Ví dụ: "phiên dịch ở công ty Nhật, 8h–17h, nghỉ CN". Để biết lúc nào quay, đăng được.</p>
+        <textarea id="viec_hien_tai" data-q></textarea></div>
+      <div class="field"><label class="f" for="quy_dinh_cty"><span class="num">11.</span>Chỗ làm hiện tại có quy định gì về đăng mạng xã hội, làm thêm không? Bạn có ngại đồng nghiệp xem kênh không?</label>
+        <p class="hint">Không biết thì ghi "không biết" — Seikin sẽ cùng bạn tính cho chắc trước khi bắt đầu.</p>
+        <textarea id="quy_dinh_cty" data-q></textarea></div>
+    </div>
+  </div>
+
+  <!-- ===== 2 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 2 — Chuyện lấy nenkin của chính bạn<span class="time">~7 phút</span></h2>
+      <p class="section-desc">Phần quan trọng nhất. Ghi đúng như bạn nhớ, kể cả lúc lo, lúc nghi ngờ — người xem tin chính những chỗ đó.</p>
+    </div>
+    <div class="section-body">
+      <div class="field"><label class="f" for="biet_truoc"><span class="num">12.</span>Trước khi về, bạn biết gì về nenkin? Ai nói cho bạn?</label>
+        <p class="hint">Ví dụ: "nghe chị cùng phòng nói về nước lấy lại được tiền, không biết bao nhiêu", "công ty phái cử dặn giữ sổ".</p>
+        <textarea id="biet_truoc" data-q></textarea></div>
+      <div class="field"><label class="f"><span class="num">13.</span>Trước khi bay về, bạn đã làm / mang theo được gì? <span style="font-weight:400">(chọn hết)</span></label>
+        <label class="opt"><input type="checkbox" name="truoc_khi_ve" value="cat_dia_chi">Cắt địa chỉ (転出届) ở toà thị chính</label>
+        <label class="opt"><input type="checkbox" name="truoc_khi_ve" value="so_nenkin">Giữ sổ nenkin / giấy có số nenkin</label>
+        <label class="opt"><input type="checkbox" name="truoc_khi_ve" value="the_ngoai_kieu">Giữ thẻ ngoại kiều (bị bấm lỗ ở sân bay)</label>
+        <label class="opt"><input type="checkbox" name="truoc_khi_ve" value="gensen">Lấy phiếu gensen (源泉徴収票) năm cuối</label>
+        <label class="opt"><input type="checkbox" name="truoc_khi_ve" value="ngan_hang">Giữ / đóng tài khoản ngân hàng Nhật</label>
+        <label class="opt"><input type="checkbox" name="truoc_khi_ve" value="khong_biet">Không làm gì, không ai dặn</label>
+        <input type="text" id="truoc_khi_ve_ghi" data-q placeholder="Có gì bạn ước là đã làm trước khi về? (không bắt buộc)" style="margin-top:4px">
+      </div>
+      <div class="field"><label class="f" for="chon_seikin"><span class="num">14.</span>Vì sao bạn chọn làm qua Seikin? Trước đó có hỏi bên nào khác, hoặc có ai rủ làm bên khác / hứa nhiều tiền không?</label>
+        <textarea id="chon_seikin" data-q></textarea></div>
+      <div class="field"><label class="f" for="luc_cho"><span class="num">15.</span>Từ lúc nộp hồ sơ đến lúc có kết quả: bạn lo gì nhất? Có lúc nào nghĩ "hay là bị lừa rồi" không?</label>
+        <p class="hint">Ghi tháng nộp và tháng có kết quả nếu nhớ. Lúc chờ bạn đã làm gì, hỏi ai?</p>
+        <textarea id="luc_cho" data-q></textarea></div>
+      <div class="field"><label class="f" for="luc_nhan"><span class="num">16.</span>Lúc nhận kết quả / nhận tiền: bạn thấy thế nào? Có gì bất ngờ (nhiều hơn, ít hơn, bị trừ gì, chậm hơn) không?</label>
+        <textarea id="luc_nhan" data-q></textarea></div>
+      <div class="field"><label class="f"><span class="num">17.</span>Nenkin lần 2 (lấy lại 20,42% thuế đã trừ ở lần 1) của bạn đang ở đâu?</label>
+        <label class="opt"><input type="radio" name="lan2" value="da_nop">Đã nộp, đang chờ</label>
+        <label class="opt"><input type="radio" name="lan2" value="da_nhan">Đã nhận xong</label>
+        <label class="opt"><input type="radio" name="lan2" value="chua_nop">Chưa nộp, đang chuẩn bị</label>
+        <label class="opt"><input type="radio" name="lan2" value="chua_biet">Chưa biết lần 2 là gì</label>
+      </div>
+      <div class="field"><label class="f"><span class="num">18.</span>Trên kênh, bạn thấy thoải mái nói số tiền mình đã nhận tới mức nào?</label>
+        <label class="opt"><input type="radio" name="noi_so_tien" value="so_that">Nói số thật</label>
+        <label class="opt"><input type="radio" name="noi_so_tien" value="khoang">Chỉ nói khoảng (ví dụ "hơn 100 man")</label>
+        <label class="opt"><input type="radio" name="noi_so_tien" value="khong">Không nói số tiền</label>
+      </div>
+      <div class="field"><label class="f"><span class="num">19.</span>Seikin có được dùng mốc thời gian thật của hồ sơ bạn (tháng nộp → tháng có kết quả) trong video không?</label>
+        <p class="hint">Chỉ mốc thời gian, không lộ tên, số sổ, số tiền nếu bạn không muốn.</p>
+        <label class="opt"><input type="radio" name="dung_moc" value="dong_y">Đồng ý</label>
+        <label class="opt"><input type="radio" name="dung_moc" value="hoi_lai">Hỏi lại mình từng video</label>
+        <label class="opt"><input type="radio" name="dung_moc" value="khong">Không</label>
+      </div>
+      <div class="field"><label class="f" for="giay_to_co"><span class="num">20.</span>Bạn đang giữ giấy tờ nào của chính mình có thể quay làm ví dụ (sẽ che thông tin)?</label>
+        <p class="hint">Ví dụ: sổ nenkin, giấy báo kết quả lần 1 (tiếng Nhật), thẻ ngoại kiều đã bấm lỗ, phiếu gensen, sao kê ngân hàng lúc tiền về. ⛔ Giấy của người khác chỉ dùng khi họ đồng ý bằng tin nhắn.</p>
+        <textarea id="giay_to_co" data-q></textarea></div>
+    </div>
+  </div>
+
+  <!-- ===== 3 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 3 — Bạn bè cùng đợt, người quanh bạn<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Không cần tên ai. Mỗi câu bạn bè hỏi bạn có thể thành một video.</p>
+    </div>
+    <div class="section-body">
+      <div class="field"><label class="f" for="ban_cung_dot"><span class="num">21.</span>Bạn bè cùng đợt / đồng hương đã về nước: khoảng bao nhiêu người, bao nhiêu người đã lấy nenkin? Người chưa lấy thì vì sao?</label>
+        <p class="hint">Ví dụ: "cùng đợt 8 người, 5 người đã lấy, 2 người mất sổ nên ngại, 1 người không biết".</p>
+        <textarea id="ban_cung_dot" data-q></textarea></div>
+      <div class="field"><label class="f" for="ban_be_hoi"><span class="num">22.</span>Từ khi bạn nhận tiền, bạn bè hỏi bạn những câu gì? Ghi đúng như họ hỏi.</label>
+        <p class="hint">Ví dụ: "Bên nào làm vậy?", "Mất bao lâu?", "Tao về 2 năm rồi còn làm được không?". Mỗi câu một dòng.</p>
+        <textarea id="ban_be_hoi" data-q placeholder="1.&#10;2.&#10;3.&#10;4.&#10;5." style="min-height:130px"></textarea></div>
+      <div class="field"><label class="f" for="hieu_lam"><span class="num">23.</span>Mọi người hay tin sai điều gì? (nghe người khác nói, đọc trên mạng)</label>
+        <p class="hint">Ví dụ: "tưởng mất sổ là mất tiền", "tưởng phải bay sang Nhật mới làm được", "tưởng bên nào hứa nhiều tiền là bên đó tốt".</p>
+        <textarea id="hieu_lam" data-q></textarea></div>
+      <div class="field"><label class="f" for="bi_lua"><span class="num">24.</span>Có ai quanh bạn bị lừa, mất tiền, mất giấy tờ, hoặc để quá hạn không lấy được nữa không? Kể 2–3 câu.</label>
+        <textarea id="bi_lua" data-q></textarea></div>
+      <div class="field"><label class="f" for="nhom_ve_nuoc"><span class="num">25.</span>Bạn đang ở nhóm Zalo / Facebook nào của người từng đi Nhật? Khoảng bao nhiêu người?</label>
+        <input type="text" id="nhom_ve_nuoc" data-q placeholder="Ví dụ: nhóm Zalo cùng đợt 40 người, nhóm FB đồng hương 5.000"></div>
+      <div class="field"><label class="f" for="ban_len_hinh"><span class="num">26.</span>Có bạn bè nào sẵn lòng kể chuyện của họ trên kênh (lộ mặt hoặc chỉ giọng) không?</label>
+        <input type="text" id="ban_len_hinh" data-q placeholder="Chỉ ghi khi bạn nghĩ họ đồng ý thật"></div>
+    </div>
+  </div>
+
+  <!-- ===== 4 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 4 — Bạn đã biết tới đâu<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Không phải bài kiểm tra. Seikin dựa vào đây để soạn tài liệu học vừa sức, bắt đầu từ chuyện gần bạn nhất.</p>
+    </div>
+    <div class="section-body">
+      <p class="hint">Mỗi mục chọn một: <b>A</b> — tự làm được / giải thích được cho người khác · <b>B</b> — biết sơ, nghe qua · <b>C</b> — chưa biết.</p>
+      <div class="field"><label class="f"><span class="num">27.</span>Nenkin lần 1 (脱退一時金): ai được lấy, cần giấy gì, khoảng bao lâu có kết quả</label>
+        <label class="opt"><input type="radio" name="kt_nenkin1" value="A">A</label><label class="opt"><input type="radio" name="kt_nenkin1" value="B">B</label><label class="opt"><input type="radio" name="kt_nenkin1" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">28.</span>Nenkin lần 2 — lấy lại 20,42% thuế đã trừ ở lần 1</label>
+        <label class="opt"><input type="radio" name="kt_nenkin2" value="A">A</label><label class="opt"><input type="radio" name="kt_nenkin2" value="B">B</label><label class="opt"><input type="radio" name="kt_nenkin2" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">29.</span>Hạn 2 năm: tính từ lúc nào, quá hạn thì sao</label>
+        <label class="opt"><input type="radio" name="kt_han" value="A">A</label><label class="opt"><input type="radio" name="kt_han" value="B">B</label><label class="opt"><input type="radio" name="kt_han" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">30.</span>Cắt địa chỉ (転出届): vì sao cần, quên cắt thì làm sao</label>
+        <label class="opt"><input type="radio" name="kt_cat_dia_chi" value="A">A</label><label class="opt"><input type="radio" name="kt_cat_dia_chi" value="B">B</label><label class="opt"><input type="radio" name="kt_cat_dia_chi" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">31.</span>Mất sổ nenkin, mất thẻ ngoại kiều, quên số nenkin</label>
+        <label class="opt"><input type="radio" name="kt_mat_giay" value="A">A</label><label class="opt"><input type="radio" name="kt_mat_giay" value="B">B</label><label class="opt"><input type="radio" name="kt_mat_giay" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">32.</span>Đọc giấy báo kết quả nenkin tiếng Nhật: ô nào là số tiền, ô nào là thuế đã trừ</label>
+        <label class="opt"><input type="radio" name="kt_doc_giay" value="A">A</label><label class="opt"><input type="radio" name="kt_doc_giay" value="B">B</label><label class="opt"><input type="radio" name="kt_doc_giay" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">33.</span>Nhận tiền về tài khoản ở Việt Nam (ngân hàng nào nhận được, tên tài khoản)</label>
+        <label class="opt"><input type="radio" name="kt_tai_khoan" value="A">A</label><label class="opt"><input type="radio" name="kt_tai_khoan" value="B">B</label><label class="opt"><input type="radio" name="kt_tai_khoan" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">34.</span>Hoàn thuế gensen cho người đang ở Nhật (chỉ cần biết sơ)</label>
+        <label class="opt"><input type="radio" name="kt_gensen" value="A">A</label><label class="opt"><input type="radio" name="kt_gensen" value="B">B</label><label class="opt"><input type="radio" name="kt_gensen" value="C">C</label></div>
+      <div class="field"><label class="f"><span class="num">35.</span>Tiếng Nhật của bạn dùng được tới đâu? <span style="font-weight:400">(chọn hết)</span></label>
+        <label class="opt"><input type="checkbox" name="tieng_nhat" value="doc_thu">Đọc hiểu thư, giấy tờ cơ quan Nhật gửi</label>
+        <label class="opt"><input type="checkbox" name="tieng_nhat" value="dien_don">Tự điền đơn từ tiếng Nhật</label>
+        <label class="opt"><input type="checkbox" name="tieng_nhat" value="goi_dien">Gọi điện hỏi cơ quan Nhật</label>
+        <label class="opt"><input type="checkbox" name="tieng_nhat" value="dung_cong_viec">Dùng tiếng Nhật trong công việc hiện tại</label>
+        <input type="text" id="jlpt" data-q placeholder="Bằng JLPT: ví dụ N3, đỗ năm 2024" style="margin-top:4px">
+      </div>
+      <div class="row">
+        <div class="field"><label class="f" for="gio_hoc"><span class="num">36.</span>Mỗi tuần dành được bao lâu để học kiến thức Seikin gửi?</label>
+          <select id="gio_hoc" data-q>
+            <option value="">— chọn —</option><option>Dưới 30 phút</option><option>30 phút – 1 tiếng</option><option>1–2 tiếng</option><option>Trên 2 tiếng</option>
+          </select></div>
+        <div class="field"><label class="f"><span class="num">37.</span>Bạn học kiểu nào dễ vào nhất? <span style="font-weight:400">(chọn hết)</span></label>
+          <label class="opt"><input type="checkbox" name="cach_hoc" value="doc">Đọc tài liệu ngắn trên điện thoại</label>
+          <label class="opt"><input type="checkbox" name="cach_hoc" value="video">Xem video giải thích</label>
+          <label class="opt"><input type="checkbox" name="cach_hoc" value="goi">Gọi điện nghe người trong nghề giảng, hỏi lại ngay</label>
+          <label class="opt"><input type="checkbox" name="cach_hoc" value="lam_that">Cầm giấy tờ thật của mình ra xem</label></div>
+      </div>
+      <div class="field"><label class="f"><span class="num">38.</span>Trên video, bạn thấy thoải mái với vai nào nhất?</label>
+        <label class="opt"><input type="radio" name="vai" value="nguoi_da_qua">Người đã đi qua — kể lại chặng của mình cho người đang đi sau</label>
+        <label class="opt"><input type="radio" name="vai" value="hoi_chuyen_gia">Người đi hỏi — mang câu hỏi của người xem đi hỏi người trong nghề</label>
+        <label class="opt"><input type="radio" name="vai" value="giai_thich">Người giải thích — đọc kịch bản Seikin soạn, nói tự tin</label>
+        <label class="opt"><input type="radio" name="vai" value="chua_biet">Chưa biết, thử rồi mới biết</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 5 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 5 — Kênh bạn đang có<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Kể cả kênh bỏ dở, kênh chỉ có vài video. Không nhớ chính xác thì ghi ước lượng.</p>
+    </div>
+    <div class="section-body">
+      <div class="plat"><h3>TikTok</h3>
+        <div class="field"><label class="f" for="tt_link">Link hoặc @tên kênh <span style="font-weight:400">(nhiều kênh thì mỗi kênh một dòng)</span></label>
+          <textarea id="tt_link" data-q style="min-height:56px"></textarea></div>
+        <div class="row">
+          <div class="field"><label class="f" for="tt_follow">Follower</label><input type="text" id="tt_follow" data-q></div>
+          <div class="field"><label class="f" for="tt_sovideo">Số video đã đăng</label><input type="text" id="tt_sovideo" data-q></div>
+          <div class="field"><label class="f" for="tt_lancuoi">Đăng lần cuối khi nào</label><input type="text" id="tt_lancuoi" data-q placeholder="tháng/năm"></div>
+        </div>
+        <div class="field"><label class="f" for="tt_chu_de">Kênh đang đăng về gì? Video nhiều view nhất nói về gì, bao nhiêu view?</label>
+          <textarea id="tt_chu_de" data-q style="min-height:56px"></textarea></div>
+        <div class="field"><label class="f" for="tt_nguoi_xem">Người xem chủ yếu ở đâu (Việt Nam hay Nhật), nam hay nữ, tuổi nào?</label>
+          <p class="hint">Xem trong TikTok Studio → Phân tích → Người xem. Chụp màn hình 28 ngày gửi kèm là tốt nhất. Không biết thì ghi "không biết".</p>
+          <input type="text" id="tt_nguoi_xem" data-q></div>
+      </div>
+      <div class="field"><label class="f"><span class="num">39.</span>Bạn muốn làm kênh nenkin ở đâu?</label>
+        <label class="opt"><input type="radio" name="kenh_nao" value="kenh_cu">Dùng luôn kênh đang có</label>
+        <label class="opt"><input type="radio" name="kenh_nao" value="kenh_moi">Lập kênh mới riêng</label>
+        <label class="opt"><input type="radio" name="kenh_nao" value="tuy_seikin">Để Seikin xem kênh rồi đề xuất</label>
+      </div>
+      <div class="plat"><h3>Facebook · Zalo</h3>
+        <div class="row">
+          <div class="field"><label class="f" for="fbcn_ban">Facebook: số bạn bè / người theo dõi</label><input type="text" id="fbcn_ban" data-q></div>
+          <div class="field"><label class="f" for="zalo_so">Zalo: khoảng bao nhiêu liên hệ là người từng đi Nhật?</label><input type="text" id="zalo_so" data-q></div>
+        </div>
+      </div>
+      <div class="field"><label class="f" for="kenh_da_lam"><span class="num">40.</span>Bạn từng đăng gì về Nhật / nenkin chưa? Có ai hỏi không?</label>
+        <textarea id="kenh_da_lam" data-q></textarea></div>
+    </div>
+  </div>
+
+  <!-- ===== 6 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 6 — Quay được gì, ở đâu, lúc nào<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Hỏi việc làm được thật mỗi tuần, không hỏi "muốn". Lịch đăng đặt theo phần này.</p>
+    </div>
+    <div class="section-body">
+      <div class="field"><label class="f"><span class="num">41.</span>Lên hình ở mức nào?</label>
+        <label class="opt"><input type="radio" name="len_hinh" value="mat_thoai">Lộ mặt, nói chuyện trước camera bình thường</label>
+        <label class="opt"><input type="radio" name="len_hinh" value="mat_doi_khi">Lộ mặt đôi khi, phần lớn quay cảnh + giọng nói</label>
+        <label class="opt"><input type="radio" name="len_hinh" value="chi_giong">Không lộ mặt — chỉ giọng nói + cảnh quay / tay cầm giấy tờ</label>
+        <label class="opt"><input type="radio" name="len_hinh" value="chi_chu">Không lộ mặt, không nói — chỉ chữ + cảnh quay</label>
+      </div>
+      <div class="field"><label class="f"><span class="num">42.</span>Những cảnh nào bạn quay được dễ dàng? <span style="font-weight:400">(chọn hết)</span></label>
+        <label class="opt"><input type="checkbox" name="canh" value="nha">Ở nhà, bàn học / bàn làm việc</label>
+        <label class="opt"><input type="checkbox" name="canh" value="que">Quê, đường làng, chợ</label>
+        <label class="opt"><input type="checkbox" name="canh" value="ngan_hang">Ngân hàng (bên ngoài) — nơi bạn nhận tiền nenkin</label>
+        <label class="opt"><input type="checkbox" name="canh" value="giay_mau">Giấy tờ của chính bạn (sẽ che thông tin)</label>
+        <label class="opt"><input type="checkbox" name="canh" value="man_hinh">Màn hình điện thoại (tin nhắn, sao kê đã che)</label>
+        <label class="opt"><input type="checkbox" name="canh" value="anh_nhat">Ảnh / video cũ hồi ở Nhật</label>
+      </div>
+      <div class="field"><label class="f" for="gio_ranh"><span class="num">43.</span>Thời gian rảnh thật trong tuần để quay / đăng?</label>
+        <p class="hint">Ghi theo ngày, ví dụ "tối T3, T5 được 1 tiếng · sáng CN được 2 tiếng".</p>
+        <textarea id="gio_ranh" data-q></textarea></div>
+      <div class="row">
+        <div class="field"><label class="f" for="so_video_tuan"><span class="num">44.</span>Mỗi tuần quay được mấy video ngắn (30–90 giây) <b>nếu Seikin soạn sẵn kịch bản</b>?</label>
+          <select id="so_video_tuan" data-q>
+            <option value="">— chọn —</option><option>1</option><option>2–3</option><option>4–5</option><option>Trên 5</option>
+          </select></div>
+        <div class="field"><label class="f" for="dung"><span class="num">45.</span>Tự dựng video (cắt ghép, thêm chữ) được tới đâu?</label>
+          <select id="dung" data-q>
+            <option value="">— chọn —</option>
+            <option>Không dựng — chỉ quay rồi gửi file</option>
+            <option>Dựng đơn giản trong app TikTok / CapCut (cắt, chữ, nhạc)</option>
+            <option>Dựng khá — tự làm được video hoàn chỉnh</option>
+          </select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label class="f" for="dien_thoai"><span class="num">46.</span>Điện thoại</label>
+          <input type="text" id="dien_thoai" data-q placeholder="Ví dụ: iPhone 13, Samsung A54"></div>
+        <div class="field"><label class="f" for="tra_loi"><span class="num">47.</span>Bạn đọc và trả lời bình luận được trong khung giờ nào?</label>
+          <input type="text" id="tra_loi" data-q placeholder="Ví dụ: 12h–13h và sau 18h"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 7 ===== -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Phần 7 — Gu, mục tiêu và giới hạn<span class="time">~4 phút</span></h2>
+      <p class="section-desc">Dán link là tốt nhất — nhìn video thật dễ hơn mô tả.</p>
+    </div>
+    <div class="section-body">
+      <div class="field"><label class="f" for="creator_xem"><span class="num">48.</span>3 kênh / người bạn hay xem nhất (bất kỳ chủ đề nào), và vì sao?</label>
+        <textarea id="creator_xem" data-q></textarea></div>
+      <div class="field"><label class="f" for="link_mau"><span class="num">49.</span>Dán 2–3 link video bạn muốn làm "kiểu như thế này"</label>
+        <p class="hint">Không cần về nenkin. Có kênh nào làm về nenkin / người về nước mà bạn thấy hay hoặc thấy dở không?</p>
+        <textarea id="link_mau" data-q></textarea></div>
+      <div class="field"><label class="f"><span class="num">50.</span>Kiểu video bạn thấy mình làm được nhất? <span style="font-weight:400">(chọn tối đa 3)</span></label>
+        <label class="opt"><input type="checkbox" name="kieu" value="ke_chuyen">Kể chuyện thật của mình (từng chặng lấy nenkin)</label>
+        <label class="opt"><input type="checkbox" name="kieu" value="hoi_dap">Trả lời câu bạn bè / người xem hỏi</label>
+        <label class="opt"><input type="checkbox" name="kieu" value="soi_giay">Cầm giấy tờ của mình chỉ từng ô</label>
+        <label class="opt"><input type="checkbox" name="kieu" value="giai_thich">Giải thích ngắn 1 vấn đề có kịch bản sẵn</label>
+        <label class="opt"><input type="checkbox" name="kieu" value="doi_song">Đời sống sau khi về nước, lồng chuyện giấy tờ</label>
+        <label class="opt"><input type="checkbox" name="kieu" value="anh_cuon">Ảnh cuộn + chữ (không nói)</label>
+      </div>
+      <div class="field"><label class="f"><span class="num">51.</span>Bạn mong kênh mang lại gì? <span style="font-weight:400">(chọn hết)</span></label>
+        <label class="opt"><input type="checkbox" name="muc_tieu" value="thu_nhap">Thêm thu nhập</label>
+        <label class="opt"><input type="checkbox" name="muc_tieu" value="chia_se">Giúp người về nước khỏi mất tiền, bị lừa</label>
+        <label class="opt"><input type="checkbox" name="muc_tieu" value="ky_nang">Học làm video, làm nội dung</label>
+        <label class="opt"><input type="checkbox" name="muc_tieu" value="ten_tuoi">Xây kênh riêng lâu dài</label>
+      </div>
+      <div class="field"><label class="f" for="ba_thang"><span class="num">52.</span>Sau 3 tháng, điều gì xảy ra thì bạn thấy "đáng công"?</label>
+        <p class="hint">Ví dụ "mỗi tuần có vài người lạ hỏi", "1.000 follower", "đều đặn 3 video/tuần".</p>
+        <input type="text" id="ba_thang" data-q></div>
+      <div class="field"><label class="f" for="nguoi_than_nhat"><span class="num">53.</span>Bạn có người thân đang ở Nhật cũng làm kênh không? Có muốn nói điều đó trên kênh, hoặc làm video chung (một người ở Nhật, một người đã về) không?</label>
+        <textarea id="nguoi_than_nhat" data-q></textarea></div>
+      <div class="field"><label class="f" for="khong_lam"><span class="num">54.</span>Có điều gì bạn KHÔNG muốn làm / không muốn lộ trên kênh?</label>
+        <p class="hint">Ví dụ: tên công ty ở Nhật, chỗ làm hiện tại, quê, gia đình, số tiền đã nhận, không livestream…</p>
+        <textarea id="khong_lam" data-q></textarea></div>
+      <div class="field"><label class="f" for="bo_cuoc"><span class="num">55.</span>Điều gì dễ làm bạn bỏ giữa chừng nhất, và Seikin giúp được gì ở chỗ đó?</label>
+        <textarea id="bo_cuoc" data-q></textarea></div>
+      <div class="field"><label class="f" for="them"><span class="num">56.</span>Còn gì muốn nói thêm không?</label>
+        <textarea id="them" data-q placeholder="Để trống cũng được"></textarea></div>
+    </div>
+  </div>
+
+<div id="export-area">
+    <div class="section">
+      <div class="section-header"><h2 class="section-title">Kết quả — gửi phần này về</h2>
+        <p class="section-desc">Bạn bấm <b>Gửi qua Zalo</b> (tốt nhất), hoặc bấm <b>Copy</b> rồi dán vào Zalo cho anh Hiến.</p></div>
+      <div class="section-body">
+        <textarea id="export-box" readonly style="min-height:260px;font-size:13px;background:#0f172a;color:#e2e8f0"></textarea>
+        <p class="hint" style="margin-top:6px">Nút nào không chạy thì bạn <b>nhấn giữ vào khung trên → Chọn tất cả → Sao chép</b> rồi dán vào Zalo.</p>
+        <div class="row">
+          <button class="primary" id="nut-chia-se" onclick="chiaSe()" style="display:none">📤 Gửi qua Zalo</button>
+          <button onclick="copyText()">📋 Copy</button>
+          <button onclick="taiJSON()">⬇ Tải file</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="badge" id="saved-badge">✓ Đã lưu</div>
+
+<div class="bar">
+  <button class="primary" onclick="xuat()">Xong — xuất kết quả</button>
+  <button class="ghost" onclick="xoaHet()">Xoá hết</button>
+</div>
+
+<script>
+const LSKEY = 'seikin_kenh_ve_v1';
+const FORM = 'KENH-VE';
+// Mọi ô có data-q (id) + mọi nhóm radio/checkbox (name) — tự gom, thêm câu không phải sửa JS.
+const ids = () => [...document.querySelectorAll('[data-q]')].map(e => e.id);
+const nhom = () => [...new Set([...document.querySelectorAll('input[type=radio],input[type=checkbox]')].map(e => e.name))];
+
+function collect(){
+  const d = { _form: FORM, _version: 1, _saved: new Date().toISOString() };
+  ids().forEach(id => d[id] = document.getElementById(id).value || '');
+  nhom().forEach(n => {
+    const chon = [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value);
+    d[n] = document.querySelector(`input[name="${n}"]`).type === 'radio' ? (chon[0] || '') : chon;
+  });
+  return d;
+}
+function restore(d){
+  ids().forEach(id => { if (d[id] != null) document.getElementById(id).value = d[id]; });
+  nhom().forEach(n => {
+    const v = [].concat(d[n] || []);
+    document.querySelectorAll(`input[name="${n}"]`).forEach(e => e.checked = v.includes(e.value));
+  });
+}
+function soDaTraLoi(){
+  const d = collect(); let n = 0, tong = 0;
+  for (const [k, v] of Object.entries(d)) { if (k.startsWith('_')) continue; tong++; if (Array.isArray(v) ? v.length : String(v).trim()) n++; }
+  return [n, tong];
+}
+function capNhat(){ const [n, t] = soDaTraLoi(); document.getElementById('progress').style.width = (n / t * 100) + '%'; }
+function luu(){
+  try { localStorage.setItem(LSKEY, JSON.stringify(collect())); } catch(e) { return; }
+  const b = document.getElementById('saved-badge'); b.classList.add('show'); setTimeout(() => b.classList.remove('show'), 1500);
+}
+function nhan(id){
+  // Ô đơn có label[for]; nhóm radio/checkbox lấy tiêu đề câu (label.f) của khối chứa nó.
+  // Không dùng ?. — WebView cũ không hiểu, lỗi cú pháp làm chết cả phiếu (chị Tuyết 02/10).
+  let l = document.querySelector(`label[for="${id}"]`);
+  if (!l) { const o = document.querySelector(`input[name="${id}"]`); const f = o && o.closest('.field'); l = f && f.querySelector('label.f'); }
+  return l ? l.textContent.replace(/\s+/g, ' ').trim() : id;
+}
+function vanBan(d){
+  const dong = [`=== PHIẾU XÂY KÊNH (NGƯỜI ĐÃ VỀ NƯỚC) — SEIKIN ===`];
+  for (const [k, v] of Object.entries(d)) {
+    if (k.startsWith('_')) continue;
+    const gt = Array.isArray(v) ? (v.length ? v.join(', ') : '—') : (String(v).trim() || '—');
+    dong.push(`• ${nhan(k)}: ${gt}`);
+  }
+  return dong.join('\n');
+}
+function bao(msg, loai){
+  const el = document.getElementById('status'); el.className = 'status ' + loai; el.textContent = msg; el.style.display = 'block';
+  if (loai === 'ok') setTimeout(() => el.style.display = 'none', 5000);
+}
+function xuat(){
+  if (!document.getElementById('ho_ten').value.trim()) { bao('Bạn điền họ tên ở câu 1 trước đã nhé.', 'err'); scrollTo({top: 0, behavior: 'smooth'}); return; }
+  luu();
+  document.getElementById('export-box').value = vanBan(collect()) + '\n\n--- JSON ---\n' + JSON.stringify(collect());
+  if (navigator.share) document.getElementById('nut-chia-se').style.display = '';
+  const a = document.getElementById('export-area'); a.style.display = 'block'; a.scrollIntoView({behavior: 'smooth'});
+  const [n, t] = soDaTraLoi();
+  bao(n < t ? `Đã xuất. Còn ${t - n} câu để trống — bạn gửi luôn cũng được, để trống cũng là thông tin.` : 'Đã xuất đủ. Bạn tải JSON gửi về nhé.', 'ok');
+}
+function taiJSON(){
+  const d = collect();
+  const ten = (d.ho_ten || 'nhanvien').trim().replace(/\s+/g, '_');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], {type: 'application/json'}));
+  a.download = `seikin_kenh-ve_${ten}_${d.ngay || new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  bao('Nếu không thấy file tải về (hay gặp khi mở trong Zalo), bạn bấm Copy rồi dán vào Zalo nhé.', 'info');
+}
+function copyText(){
+  const o = document.getElementById('export-box');
+  const lui = () => { o.focus(); o.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(e) {}
+    bao(ok ? 'Đã copy. Bạn dán vào Zalo gửi về nhé.' : 'Máy không cho copy tự động — bạn nhấn giữ vào khung → Chọn tất cả → Sao chép.', ok ? 'ok' : 'err'); };
+  if (navigator.clipboard) navigator.clipboard.writeText(o.value).then(() => bao('Đã copy. Bạn dán vào Zalo gửi về nhé.', 'ok'), lui); else lui();
+}
+// Chia sẻ thẳng sang Zalo/Messenger — không cần tải file (trình duyệt trong Zalo hay chặn tải file).
+function chiaSe(){
+  navigator.share({ title: 'Phiếu xây kênh — Seikin', text: document.getElementById('export-box').value })
+    .catch(() => bao('Chưa gửi được — bạn bấm Copy rồi dán vào Zalo nhé.', 'err'));
+}
+function xoaHet(){
+  if (!confirm('Xoá hết những gì đã điền?')) return;
+  try { localStorage.removeItem(LSKEY); } catch(e) {}
+  location.reload();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('js-loi').style.display = 'none';
+  document.getElementById('ngay').value = new Date().toISOString().slice(0, 10);
+  let s = null; try { s = localStorage.getItem(LSKEY); } catch(e) {}
+  if (s) { try { const d = JSON.parse(s); restore(d); bao('Đã mở lại phần đang điền dở.', 'info'); } catch(e) {} }
+  document.querySelectorAll('input,select,textarea').forEach(el => {
+    el.addEventListener('input', () => { capNhat(); luu(); });
+    el.addEventListener('change', () => { capNhat(); luu(); });
+  });
+  capNhat();
+});
+</script>
+</body>
+</html>
